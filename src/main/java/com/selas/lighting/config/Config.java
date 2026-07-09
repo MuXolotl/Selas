@@ -40,7 +40,7 @@ public class Config {
 
         BUILDER.comment("Behavior").push("behavior");
         BLOCK_LIGHT_ONLY = BUILDER.comment("Only affect block light; leave sky light untouched.").define("blockLightOnly", false);
-        IGNORE_MOON_PHASE = BUILDER.comment("Ignore moon phase when computing night brightness.").define("ignoreMoonPhase", false);
+        IGNORE_MOON_PHASE = BUILDER.comment("Ignore moon phase when computing night brightness.").define("ignoreMoonPhase", true);
         ENABLE_COLOR_TEMPERATURE = BUILDER.comment("[Phase 2, unused] Tint light by source color temperature.").define("enableColorTemperature", false);
         ENABLE_EYE_ADAPTATION = BUILDER.comment("[Phase 3, unused] Temporal eye adaptation.").define("enableEyeAdaptation", false);
         BUILDER.pop();

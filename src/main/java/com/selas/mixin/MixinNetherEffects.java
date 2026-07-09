@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinNetherEffects {
     private static final double MIN = 0.029999999329447746D;
 
-    @Inject(method = "getBrightnessDependentFogColor", at = @At("RETURN"), cancellable = true)
-    private void onAdjustFogColor(CallbackInfoReturnable<Vec3> ci) {
+    @Inject(method = "getBrightnessDependentFogColor(Lnet/minecraft/world/phys/Vec3;F)Lnet/minecraft/world/phys/Vec3;", at = @At("RETURN"), cancellable = true)
+    private void onAdjustFogColor(Vec3 fogColor, float daylight, CallbackInfoReturnable<Vec3> ci) {
         double factor = LightmapEngine.darkNetherFog();
         if (factor != 1.0) {
             Vec3 result = ci.getReturnValue();
