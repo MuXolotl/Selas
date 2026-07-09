@@ -6,7 +6,7 @@ It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla
 
 ## Downloads
 
-- GitHub Releases: https://github.com/MuXolotl/Selas/releases/tag/v0.1
+- GitHub Releases: https://github.com/MuXolotl/Selas/releases/latest
 - Modrinth: https://modrinth.com/mod/selas
 - CurseForge: https://www.curseforge.com/minecraft/mc-mods/selas
 
