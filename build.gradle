@@ -38,8 +38,13 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
-    // Specify the version of NeoForge to use.
-    version = project.neo_version
+    // Alternative pipeline: skip Minecraft decompilation/recompilation (vineflower).
+    // The official mapped jar is still produced and used to compile against; only the
+    // decompiled *sources* for IDE navigation are skipped. This is what CI uses by default.
+    enable {
+        version = project.neo_version
+        disableRecompilation = true
+    }
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
