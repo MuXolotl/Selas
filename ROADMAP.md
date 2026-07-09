@@ -2,34 +2,19 @@
 
 ## 0.1.x
 
-Focus: stabilize the first darkness module.
+- Fix bugs from the first release.
+- Adjust default values if needed.
+- Improve shader compatibility notes.
 
-- Fix crashes or compatibility problems.
-- Adjust default config values if testing shows clear issues.
-- Improve config descriptions.
-- Add project icon and screenshots.
-- Check shader behavior and document known limitations.
+## 0.2
 
-## 0.2.x
+Fog and atmosphere.
 
-Focus: fog and atmosphere controls.
+## 0.3
 
-- Optional night fog darkening.
-- Optional rain and thunder visibility changes.
-- Separate Nether and End fog factors.
-- Config options to disable fog changes when shaders are active.
-
-## 0.3.x
-
-Focus: eye adaptation and exposure.
-
-- Smooth transition when moving between bright and dark areas.
-- Configurable adaptation speed.
-- Separate adaptation for caves and open sky.
+Eye adaptation.
 
 ## Later
 
-- Optional server-side day length control.
-- Color temperature by time of day.
-- Better shader compatibility detection.
-- Optional dynamic light support or integration.
+- Optional day length changes.
+- Dynamic light support.

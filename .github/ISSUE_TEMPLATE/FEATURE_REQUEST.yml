@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an idea for this project
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clearly describe what you would like to change, add, or implement.
+      placeholder: Tell us your idea.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Explain why this would be useful or what problem it solves.
+      placeholder: What would this improve?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: existing-issues
+    attributes:
+      label: Have you searched for existing issues? 🔎
+      description: Please check if the same idea has already been suggested.
+      options:
+        - label: I have searched and found no existing issues.
+          required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Add examples, screenshots, links, or references if useful.
+      placeholder: Any extra details?
+    validations:
+      required: false

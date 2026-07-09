@@ -1,65 +1,62 @@
 # Selas
 
-Selas is a client-side NeoForge mod for Minecraft 1.21.1.
+Selas is a small client-side NeoForge mod for Minecraft 1.21.1.
 
-The current version changes the vanilla lightmap to make night, caves, rain and thunder darker. It does not add blocks, items, mobs, dimensions or server-side mechanics.
+It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla lightmap. It does not add blocks, items, mobs, dimensions, dynamic lights, fog, or server-side time changes.
 
-## Current scope
+## Downloads
 
-Selas v0.1 is focused on one feature: configurable darkness.
+- GitHub Releases: https://github.com/MuXolotl/Selas/releases/tag/v0.1
+- Modrinth: https://modrinth.com/mod/selas
+- CurseForge: https://www.curseforge.com/minecraft/mc-mods/selas
 
-It changes:
+## What it changes
 
-- how dark the world becomes after sunset;
-- when the transition into full night starts and ends;
-- how much moon phase affects night brightness;
-- how much rain and thunder reduce sky light;
-- how low the minimum visible brightness can go;
-- how strongly block light sources are preserved;
-- how much color is desaturated or cooled in low light.
-
-It does not currently change:
-
-- the actual Minecraft day length;
-- mob spawning rules;
-- server time;
-- block light propagation;
-- sky rendering;
-- fog rendering;
-- dynamic lights.
+- night brightness
+- cave darkness
+- rain and thunder darkness
+- moon phase brightness
+- dusk and dawn transition timing
+- minimum brightness floor
+- block light preservation
+- low-light desaturation
+- low-light cool tint
 
 ## Configuration
 
-Selas does not provide built-in presets. The default values are the intended baseline, and each part of the lighting behavior is configured directly.
-
-The generated client config is:
+Selas uses a client config file:
 
 ```text
 config/selas-client.toml
 ```
 
-See [`docs/configuration.md`](docs/configuration.md) for the current config layout and test commands.
+The config is split into sections:
 
-## Known visual behavior
+```text
+natural_darkness.general
+natural_darkness.dimensions
+natural_darkness.twilight
+natural_darkness.natural_light
+natural_darkness.darkness
+natural_darkness.color
+```
 
-Minecraft lighting uses a small lightmap and only 16 raw light levels. During dusk and dawn, some block textures can show visible grain or shimmer. This also exists in vanilla, but a darker night can make it easier to see.
+Selas does not use built-in presets. Change the values directly if the defaults do not fit your setup.
 
-Selas currently keeps this behavior instead of hiding it with post-processing or texture overlays.
+## Notes
+
+Minecraft uses a small lightmap and 16 raw light levels. Some texture grain or shimmer during dusk and dawn is visible in vanilla too. Selas can make it easier to notice because the world is darker.
+
+Shader packs may change or override the final lighting result.
 
 ## Requirements
 
-- Minecraft: 1.21.1
-- Loader: NeoForge
-- Java: 21
-- License: MIT
+- Minecraft 1.21.1
+- NeoForge
+- Java 21
 
-## Development
-
-Open the project in IntelliJ IDEA Community Edition and import it as a Gradle project.
-
-Useful Gradle tasks:
+## Building
 
 ```bash
-./gradlew runClient
 ./gradlew build
 ```

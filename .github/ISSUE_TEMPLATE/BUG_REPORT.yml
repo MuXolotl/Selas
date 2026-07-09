@@ -1,0 +1,91 @@
+name: Bug report
+description: Report a problem you encountered
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear description of the problem.
+      placeholder: What happened? What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: existing-issues
+    attributes:
+      label: Have you searched for existing issues? 🔎
+      description: Please check if the same problem has already been reported.
+      options:
+        - label: I have searched and found no existing issues.
+          required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the steps needed to reproduce the problem.
+      placeholder: |
+        1. Start the game
+        2. Set time/weather/config to ...
+        3. Go to ...
+        4. See ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or videos
+      description: Add screenshots, gifs, or videos if they help explain the problem.
+      placeholder: Upload screenshots, gifs, or videos here.
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: If the game crashed or printed errors, paste the relevant log or crash report.
+      placeholder: Paste logs here or link to a paste service.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Selas config
+      description: If you changed the config, paste the relevant values from selas-client.toml.
+      placeholder: Paste changed Selas config values here.
+      render: toml
+    validations:
+      required: false
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System info
+      description: Provide information about your setup.
+      value: |
+        Operating system:
+        Minecraft version:
+        NeoForge version:
+        Selas version:
+        Java version:
+        Other mods:
+        Shader pack:
+        Resource pack:
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Add any other useful information about the problem here.
+      placeholder: Is there any additional information that may help?
+    validations:
+      required: false
