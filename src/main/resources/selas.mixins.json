@@ -1,12 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.selas.mixin",
+  "package": "dev.muxolotl.selas.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "MixinLightTexture",
-    "MixinEndEffects",
-    "MixinNetherEffects"
+  "client": [
+    "client.LightTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

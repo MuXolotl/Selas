@@ -1,0 +1,20 @@
+{
+  "modmenu.descriptionTranslation.selas": "Реалистичное и гибко настраиваемое освещение и таймцикл.",
+  "selas.configuration.enabled": "Включить естественную темноту",
+  "selas.configuration.affect_overworld": "Влиять на Верхний мир",
+  "selas.configuration.affect_custom_sky_dimensions": "Влиять на пользовательские измерения с небом",
+  "selas.configuration.affect_skyless_dimensions": "Влиять на измерения без неба",
+  "selas.configuration.respect_night_vision": "Учитывать ночное зрение",
+  "selas.configuration.respect_lightning_flashes": "Учитывать вспышки молний",
+  "selas.configuration.moonless_night_sky_factor": "Яркость неба в безлунную ночь",
+  "selas.configuration.full_moon_sky_factor": "Яркость неба в полнолуние",
+  "selas.configuration.skyless_dimension_light_factor": "Фактор света в измерениях без неба",
+  "selas.configuration.minimum_luminance_floor": "Минимальный порог видимой яркости",
+  "selas.configuration.cave_luminance_floor": "Порог яркости в пещерах",
+  "selas.configuration.darkness_curve": "Кривая темноты",
+  "selas.configuration.block_light_preservation": "Сохранение блочного света",
+  "selas.configuration.rain_darkening": "Затемнение дождём",
+  "selas.configuration.thunder_darkening": "Затемнение грозой",
+  "selas.configuration.night_desaturation": "Ночная десатурация",
+  "selas.configuration.night_cool_tint": "Холодный ночной оттенок"
+}

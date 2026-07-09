@@ -38,13 +38,8 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
-    // Alternative pipeline: skip Minecraft decompilation/recompilation (vineflower).
-    // The official mapped jar is still produced and used to compile against; only the
-    // decompiled *sources* for IDE navigation are skipped. This is what CI uses by default.
-    enable {
-        version = project.neo_version
-        disableRecompilation = true
-    }
+    // Specify the version of NeoForge to use.
+    version = project.neo_version
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -158,6 +153,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_name               : mod_name,
             mod_license            : mod_license,
             mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
     ]
     inputs.properties replaceProperties
     expand replaceProperties

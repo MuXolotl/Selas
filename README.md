@@ -1,44 +1,27 @@
 # Selas
 
-Реалистичное освещение для Minecraft на **NeoForge 1.21.1**.
+Selas is a NeoForge mod by MuXolotl focused on realistic, configurable lighting and time-cycle systems for Minecraft.
 
-Начинается с реалистичной тьмы (убирается минимальный порог яркости, который в ванили
-делает даже light level 0 «не совсем чёрным»), дальше — цветовая температура источников,
-адаптация глаза и прочее.
+The first development target is **natural darkness**: harsher, more believable night and cave visibility without turning the game into a flat black screen.
 
-## Сборка
+## Current scope
 
-- Требуется **JDK 21** (Minecraft 1.21.1 поставляется на Java 21).
-- `./gradlew build` — собирает мод-jar в `build/libs/`.
-- `./gradlew runClient` — запуск игры с модом для ручной проверки.
+- Minecraft: 1.21.1
+- Loader: NeoForge
+- Java: 21
+- License: MIT
 
-> Примечание: в `build.gradle` отключена рекомпиляция Minecraft (`disableRecompilation = true`),
-> чтобы сборка не зависела от декомпилятора (vineflower) — для компиляции мода это не нужно.
-> Если хочешь видеть исходники MC в IDE, уберИ эту опцию (понадобится больше RAM).
+## Development
 
-## Структура
+Open the project in IntelliJ IDEA Community Edition and import it as a Gradle project.
 
-- `com.selas.Selas` / `SelasClient` — точки входа (common / client).
-- `com.selas.lighting.LightmapEngine` — ядро: пересчёт таблицы целевой яркости `LUMINANCE[16][16]`
-  и применение к текстуре lightmap перед отправкой на GPU.
-- `com.selas.lighting.config.Config` — конфиг (NeoForge `ModConfigSpec`).
-- `com.selas.lighting.LightmapAccess` / `TextureAccess` — контракты между миксинами и ядром.
-- `com.selas.mixin.*` — миксины в `LightTexture`, `DynamicTexture`, `GameRenderer` и эффекты
-  измерений (`EndEffects` / `NetherEffects`).
+Useful Gradle tasks:
 
-## Конфиг (в игре: Mods → Selas → Config)
+```bash
+./gradlew runClient
+./gradlew build
+```
 
-- По измерениям: Overworld / Nether / End / default / skyless.
-- Яркость тумана Nether / End.
-- «Только блочный свет» и «игнорировать фазу луны».
+## Design notes
 
-## Дорожная карта
-
-- [x] Фаза 0 — каркас + подключение миксинов (NeoForge 1.21.1)
-- [x] Фаза 1 — реалистичная тьма (MVP, играбельно)
-- [ ] Фаза 2 — цветовая температура источников (тёплый торш, нейтральное солнце, холодная луна)
-- [ ] Фаза 3 — адаптация глаза (корректно, без ущерба играбельности)
-- [ ] Фаза 4 — туман / рассеивание
-- [ ] Фаза 5 — совместимость (Iris / OptiFine / Distant Horizons), релиз
-
-Лицензия: MIT.
+Selas intentionally avoids built-in presets. All visual behavior should be controlled through explicit, flexible configuration values.

@@ -1,36 +1,29 @@
-# neoforge.mods.toml for Selas
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
-
 license="${mod_license}"
+#issueTrackerURL="https://github.com/MuXolotl/Selas/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
+#displayURL="https://github.com/MuXolotl/Selas"
+authors="${mod_authors}"
+description='''${mod_description}'''
 
-# The authors of the mod, displayed in the mod UI
-authors="MuXolotl"
-
-description='''
-Selas — realistic lighting for Minecraft.
-Starts with realistic darkness (no minimum-light floor), more to come.
-'''
-
-# Declare our Mixin config so FML loads it. No Gradle plugin needed on NeoForge 1.21+.
 [[mixins]]
 config="${mod_id}.mixins.json"
 
 [[dependencies.${mod_id}]]
-modId="neoforge"
-type="required"
-versionRange="[${neo_version},)"
-ordering="NONE"
-side="BOTH"
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="minecraft"
-type="required"
-versionRange="${minecraft_version_range}"
-ordering="NONE"
-side="BOTH"
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"

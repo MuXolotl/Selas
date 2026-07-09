@@ -1,5 +1,20 @@
 {
-  "selas.configuration.title": "Selas",
-  "selas.configuration.dimensions": "Dimensions",
-  "selas.configuration.behavior": "Behavior"
+  "modmenu.descriptionTranslation.selas": "Realistic, configurable lighting and time-cycle systems.",
+  "selas.configuration.enabled": "Enable natural darkness",
+  "selas.configuration.affect_overworld": "Affect Overworld",
+  "selas.configuration.affect_custom_sky_dimensions": "Affect custom sky dimensions",
+  "selas.configuration.affect_skyless_dimensions": "Affect skyless dimensions",
+  "selas.configuration.respect_night_vision": "Respect Night Vision",
+  "selas.configuration.respect_lightning_flashes": "Respect lightning flashes",
+  "selas.configuration.moonless_night_sky_factor": "Moonless night sky factor",
+  "selas.configuration.full_moon_sky_factor": "Full moon sky factor",
+  "selas.configuration.skyless_dimension_light_factor": "Skyless dimension light factor",
+  "selas.configuration.minimum_luminance_floor": "Minimum luminance floor",
+  "selas.configuration.cave_luminance_floor": "Cave luminance floor",
+  "selas.configuration.darkness_curve": "Darkness curve",
+  "selas.configuration.block_light_preservation": "Block light preservation",
+  "selas.configuration.rain_darkening": "Rain darkening",
+  "selas.configuration.thunder_darkening": "Thunder darkening",
+  "selas.configuration.night_desaturation": "Night desaturation",
+  "selas.configuration.night_cool_tint": "Night cool tint"
 }
