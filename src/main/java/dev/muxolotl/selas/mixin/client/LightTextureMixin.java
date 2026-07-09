@@ -14,8 +14,19 @@ public abstract class LightTextureMixin {
     @Shadow
     private NativeImage lightPixels;
 
+    @Shadow
+    private boolean updateLightTexture;
+
+    @Inject(method = "updateLightTexture", at = @At("HEAD"))
+    private void selas$forceSmoothLightmapUpdates(float partialTick, CallbackInfo ci) {
+        if (SelasLightmap.shouldUpdateEveryFrame()) {
+            this.updateLightTexture = true;
+        }
+    }
+
     @Inject(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"))
-    private void selas$applyNaturalDarkness(CallbackInfo ci) {
-        SelasLightmap.transform(this.lightPixels);
+    private void selas$applyNaturalDarkness(float partialTick, CallbackInfo ci) {
+        float selasPartialTick = SelasLightmap.shouldUpdateEveryFrame() ? partialTick : 0.0F;
+        SelasLightmap.transform(this.lightPixels, selasPartialTick);
     }
 }

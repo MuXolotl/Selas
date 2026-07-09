@@ -14,11 +14,23 @@ public final class SelasLightmap {
     private static final float LUMINANCE_R = 0.2126F;
     private static final float LUMINANCE_G = 0.7152F;
     private static final float LUMINANCE_B = 0.0722F;
+    private static final float MINECRAFT_DAY_TICKS = 24000.0F;
 
     private SelasLightmap() {
     }
 
-    public static void transform(NativeImage pixels) {
+    public static boolean shouldUpdateEveryFrame() {
+        if (!SelasClientConfig.ENABLED.getAsBoolean() || !SelasClientConfig.SMOOTH_LIGHTMAP_UPDATES.getAsBoolean()) {
+            return false;
+        }
+
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientLevel level = minecraft.level;
+        LocalPlayer player = minecraft.player;
+        return level != null && player != null && shouldAffect(level, player);
+    }
+
+    public static void transform(NativeImage pixels, float partialTick) {
         if (!SelasClientConfig.ENABLED.getAsBoolean() || pixels == null) {
             return;
         }
@@ -31,7 +43,7 @@ public final class SelasLightmap {
             return;
         }
 
-        LightingContext context = LightingContext.create(level);
+        LightingContext context = LightingContext.create(level, partialTick);
 
         for (int blockIndex = 0; blockIndex < 16; blockIndex++) {
             for (int skyIndex = 0; skyIndex < 16; skyIndex++) {
@@ -129,14 +141,14 @@ public final class SelasLightmap {
     }
 
     private record LightingContext(float skyFactor, float nightAmount, boolean skyless) {
-        private static LightingContext create(ClientLevel level) {
+        private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
                 float factor = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
                 return new LightingContext(factor, 1.0F, true);
             }
 
-            float celestial = positiveFraction(level.getTimeOfDay(1.0F));
-            float night = calculateNightAmount(celestial);
+            float dayTick = positiveModulo((level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
+            float night = calculateNightAmount(dayTick);
             float moon = saturate(level.getMoonBrightness());
             float moonless = (float) SelasClientConfig.MOONLESS_NIGHT_SKY_FACTOR.getAsDouble();
             float fullMoon = (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble();
@@ -166,19 +178,54 @@ public final class SelasLightmap {
         }
     }
 
-    private static float calculateNightAmount(float celestial) {
-        float dusk = smoothStep(0.235F, 0.345F, celestial);
-        float dawn = smoothStep(0.655F, 0.765F, celestial);
-        return saturate(dusk * (1.0F - dawn));
+    private static float calculateNightAmount(float dayTick) {
+        float duskStart = SelasClientConfig.DUSK_TRANSITION_START_TICK.get();
+        float fullNightStart = SelasClientConfig.FULL_NIGHT_START_TICK.get();
+        float fullNightEnd = SelasClientConfig.FULL_NIGHT_END_TICK.get();
+        float dawnEnd = SelasClientConfig.DAWN_TRANSITION_END_TICK.get();
+
+        if (isInWrappedRange(dayTick, duskStart, fullNightStart)) {
+            return smootherStep(progressInWrappedRange(dayTick, duskStart, fullNightStart));
+        }
+
+        if (isInWrappedRange(dayTick, fullNightStart, fullNightEnd)) {
+            return 1.0F;
+        }
+
+        if (isInWrappedRange(dayTick, fullNightEnd, dawnEnd)) {
+            return 1.0F - smootherStep(progressInWrappedRange(dayTick, fullNightEnd, dawnEnd));
+        }
+
+        return 0.0F;
     }
 
-    private static float smoothStep(float edge0, float edge1, float value) {
-        float t = saturate((value - edge0) / (edge1 - edge0));
-        return t * t * (3.0F - 2.0F * t);
+    private static boolean isInWrappedRange(float value, float start, float end) {
+        float length = wrappedDistance(start, end);
+        if (length <= 0.0F) {
+            return false;
+        }
+        return wrappedDistance(start, value) <= length;
     }
 
-    private static float positiveFraction(float value) {
-        float fraction = value - Mth.floor(value);
-        return fraction < 0.0F ? fraction + 1.0F : fraction;
+    private static float progressInWrappedRange(float value, float start, float end) {
+        float length = wrappedDistance(start, end);
+        if (length <= 0.0F) {
+            return 1.0F;
+        }
+        return saturate(wrappedDistance(start, value) / length);
+    }
+
+    private static float wrappedDistance(float start, float end) {
+        return positiveModulo(end - start, MINECRAFT_DAY_TICKS);
+    }
+
+    private static float smootherStep(float value) {
+        float t = saturate(value);
+        return t * t * t * (t * (t * 6.0F - 15.0F) + 10.0F);
+    }
+
+    private static float positiveModulo(float value, float modulo) {
+        float result = value % modulo;
+        return result < 0.0F ? result + modulo : result;
     }
 }

@@ -11,6 +11,12 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.BooleanValue AFFECT_SKYLESS_DIMENSIONS;
     public static final ModConfigSpec.BooleanValue RESPECT_NIGHT_VISION;
     public static final ModConfigSpec.BooleanValue RESPECT_LIGHTNING_FLASHES;
+    public static final ModConfigSpec.BooleanValue SMOOTH_LIGHTMAP_UPDATES;
+
+    public static final ModConfigSpec.IntValue DUSK_TRANSITION_START_TICK;
+    public static final ModConfigSpec.IntValue FULL_NIGHT_START_TICK;
+    public static final ModConfigSpec.IntValue FULL_NIGHT_END_TICK;
+    public static final ModConfigSpec.IntValue DAWN_TRANSITION_END_TICK;
 
     public static final ModConfigSpec.DoubleValue MOONLESS_NIGHT_SKY_FACTOR;
     public static final ModConfigSpec.DoubleValue FULL_MOON_SKY_FACTOR;
@@ -58,6 +64,31 @@ public final class SelasClientConfig {
                 .comment("Disable Selas darkness during lightning sky flashes.")
                 .translation("selas.configuration.respect_lightning_flashes")
                 .define("respect_lightning_flashes", true);
+
+        SMOOTH_LIGHTMAP_UPDATES = BUILDER
+                .comment("Force the tiny vanilla lightmap texture to update every rendered frame while Selas is active. This makes dusk and dawn transitions smoother.")
+                .translation("selas.configuration.smooth_lightmap_updates")
+                .define("smooth_lightmap_updates", true);
+
+        DUSK_TRANSITION_START_TICK = BUILDER
+                .comment("Minecraft day tick when Selas begins fading from daylight into natural night. Vanilla sunset is around 12000.")
+                .translation("selas.configuration.dusk_transition_start_tick")
+                .defineInRange("dusk_transition_start_tick", 11800, 0, 23999);
+
+        FULL_NIGHT_START_TICK = BUILDER
+                .comment("Minecraft day tick when the night reaches full Selas darkness after twilight.")
+                .translation("selas.configuration.full_night_start_tick")
+                .defineInRange("full_night_start_tick", 14000, 0, 23999);
+
+        FULL_NIGHT_END_TICK = BUILDER
+                .comment("Minecraft day tick when full Selas darkness starts fading into dawn.")
+                .translation("selas.configuration.full_night_end_tick")
+                .defineInRange("full_night_end_tick", 21200, 0, 23999);
+
+        DAWN_TRANSITION_END_TICK = BUILDER
+                .comment("Minecraft day tick when dawn finishes and Selas returns to daylight. This value may be lower than full_night_end_tick because dawn crosses midnight.")
+                .translation("selas.configuration.dawn_transition_end_tick")
+                .defineInRange("dawn_transition_end_tick", 400, 0, 23999);
 
         MOONLESS_NIGHT_SKY_FACTOR = BUILDER
                 .comment("Relative natural sky brightness at midnight during a moonless night. Lower values are darker.")

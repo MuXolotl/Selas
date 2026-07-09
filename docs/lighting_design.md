@@ -9,6 +9,8 @@ Selas does not ship built-in presets. The default configuration should be opinio
 - No forced gamma changes.
 - Strong block lights should remain useful.
 - Moon phase and weather should matter.
+- Dusk and dawn should use a continuous, configurable twilight curve instead of a delayed on/off night gate.
+- Per-frame lightmap updates are useful for smoother transitions.
 - Night Vision, useful underwater Conduit vision, and lightning flashes should remain readable.
 
 ## Later modules
