@@ -1,13 +1,13 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
-#issueTrackerURL="https://github.com/MuXolotl/Selas/issues"
+issueTrackerURL="https://github.com/MuXolotl/Selas/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-#displayURL="https://github.com/MuXolotl/Selas"
+displayURL="https://github.com/MuXolotl/Selas"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
