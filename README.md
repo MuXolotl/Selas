@@ -1,4 +1,8 @@
-# Selas
+<div align="center">
+
+![Selas-banner](https://raw.githubusercontent.com/MuXolotl/Selas/main/assets/image/banner.png)
+
+# ☀️ Selas 🌑
 
 Selas is a small client-side NeoForge mod for Minecraft 1.21.1.
 
@@ -6,9 +10,11 @@ It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla
 
 ## Downloads
 
-- GitHub Releases: https://github.com/MuXolotl/Selas/releases/latest
-- Modrinth: https://modrinth.com/mod/selas
-- CurseForge: https://www.curseforge.com/minecraft/mc-mods/selas
+[![CurseForge](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg)](https://www.curseforge.com/minecraft/mc-mods/selas) [![Dodrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg)](https://modrinth.com/mod/selas) [![GitHub Releases](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github_vector.svg)](https://github.com/MuXolotl/Selas/releases/latest)
+
+</div>
+
+---
 
 ## What it changes
 
@@ -21,6 +27,8 @@ It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla
 - block light preservation
 - low-light desaturation
 - low-light cool tint
+
+---
 
 ## Configuration
 
@@ -43,11 +51,13 @@ natural_darkness.color
 
 Selas does not use built-in presets. Change the values directly if the defaults do not fit your setup.
 
-## Notes
+> [!Note]
+> 
+> Minecraft uses a small lightmap and 16 raw light levels. Some texture grain or shimmer during dusk and dawn is visible in vanilla too. Selas can make it easier to notice because the world is darker.
+>
+> Shader packs may change or override the final lighting result.
 
-Minecraft uses a small lightmap and 16 raw light levels. Some texture grain or shimmer during dusk and dawn is visible in vanilla too. Selas can make it easier to notice because the world is darker.
-
-Shader packs may change or override the final lighting result.
+---
 
 ## Requirements
 
