@@ -9,6 +9,7 @@
 ### Changed
 
 - Increased natural sky brightness during lunar phases, especially during full moon and intermediate phases.
+- Improved sky and block light composition.
 
 ### Fixed
 

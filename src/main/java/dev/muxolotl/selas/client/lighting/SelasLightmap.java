@@ -92,8 +92,8 @@ public final class SelasLightmap {
         float sky = skyIndex / 15.0F;
 
         float blockContribution = saturate(block * (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble());
-        float skyContribution = sky * context.skyFactor();
-        float effectiveLight = Math.max(blockContribution, skyContribution);
+        float skyContribution = saturate(sky * context.skyFactor());
+        float effectiveLight = combineLightContributions(blockContribution, skyContribution);
 
         float floor = context.floor(block, sky);
         float curve = (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble();
@@ -148,6 +148,10 @@ public final class SelasLightmap {
         return Mth.clamp(value, 0.0F, 1.0F);
     }
 
+    private static float combineLightContributions(float block, float sky) {
+        return saturate(block + sky - block * sky);
+    }
+
     private record LightingContext(float skyFactor, float nightAmount, boolean skyless) {
         private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
@@ -184,7 +188,7 @@ public final class SelasLightmap {
             }
 
             float caveFloor = (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble();
-            float lowLight = 1.0F - saturate(Math.max(block, sky));
+            float lowLight = 1.0F - combineLightContributions(saturate(block), saturate(sky));
             return Mth.lerp(lowLight, generalFloor, Math.min(generalFloor, caveFloor));
         }
     }
