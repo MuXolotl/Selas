@@ -9,11 +9,17 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.BooleanValue SMOOTH_LIGHTMAP_UPDATES;
     public static final ModConfigSpec.BooleanValue RESPECT_NIGHT_VISION;
     public static final ModConfigSpec.BooleanValue RESPECT_LIGHTNING_FLASHES;
+    public static final ModConfigSpec.BooleanValue RESPECT_GAMMA;
 
     public static final ModConfigSpec.BooleanValue AFFECT_OVERWORLD;
     public static final ModConfigSpec.BooleanValue AFFECT_CUSTOM_SKY_DIMENSIONS;
     public static final ModConfigSpec.BooleanValue AFFECT_SKYLESS_DIMENSIONS;
     public static final ModConfigSpec.DoubleValue SKYLESS_DIMENSION_LIGHT_FACTOR;
+
+    public static final ModConfigSpec.DoubleValue NETHER_LIGHT_FACTOR;
+    public static final ModConfigSpec.DoubleValue NETHER_WARM_TINT;
+    public static final ModConfigSpec.DoubleValue END_LIGHT_FACTOR;
+    public static final ModConfigSpec.DoubleValue END_COOL_TINT;
 
     public static final ModConfigSpec.IntValue DUSK_TRANSITION_START_TICK;
     public static final ModConfigSpec.IntValue FULL_NIGHT_START_TICK;
@@ -67,6 +73,11 @@ public final class SelasClientConfig {
                 .translation("selas.configuration.respect_lightning_flashes")
                 .define("respect_lightning_flashes", true);
 
+        RESPECT_GAMMA = BUILDER
+                .comment("Lets the brightness slider (gamma) still brighten the world while Selas is active. Off keeps Selas's darkness consistent regardless of the slider.")
+                .translation("selas.configuration.respect_gamma")
+                .define("respect_gamma", false);
+
         BUILDER.pop();
 
         BUILDER
@@ -85,14 +96,41 @@ public final class SelasClientConfig {
                 .define("affect_custom_sky_dimensions", true);
 
         AFFECT_SKYLESS_DIMENSIONS = BUILDER
-                .comment("Applies the effect in dimensions without skylight.")
+                .comment("Applies the effect in dimensions without skylight (other than the Nether and End).")
                 .translation("selas.configuration.affect_skyless_dimensions")
                 .define("affect_skyless_dimensions", true);
 
         SKYLESS_DIMENSION_LIGHT_FACTOR = BUILDER
-                .comment("Brightness factor used where there is no sun or moon. Lower values make skyless dimensions darker.")
+                .comment("Brightness factor used where there is no sun or moon and the dimension is neither the Nether nor the End. Lower values make those dimensions darker.")
                 .translation("selas.configuration.skyless_dimension_light_factor")
                 .defineInRange("skyless_dimension_light_factor", 0.09D, 0.0D, 1.0D);
+
+        BUILDER.pop();
+
+        BUILDER
+                .comment("Per-dimension lighting for the Nether and End. These replace the generic skyless profile for those dimensions so they are no longer pitch black.")
+                .translation("selas.configuration.section.dimension_lighting")
+                .push("dimension_lighting");
+
+        NETHER_LIGHT_FACTOR = BUILDER
+                .comment("Base ambient brightness added across the Nether. Higher values make the Nether more playable but less moody.")
+                .translation("selas.configuration.nether_light_factor")
+                .defineInRange("nether_light_factor", 0.12D, 0.0D, 1.0D);
+
+        NETHER_WARM_TINT = BUILDER
+                .comment("Warm (reddish/orange) tint applied in darker Nether areas, evoking lava and fire glow.")
+                .translation("selas.configuration.nether_warm_tint")
+                .defineInRange("nether_warm_tint", 0.05D, 0.0D, 0.5D);
+
+        END_LIGHT_FACTOR = BUILDER
+                .comment("Base ambient brightness added across the End. Higher values make the void more visible.")
+                .translation("selas.configuration.end_light_factor")
+                .defineInRange("end_light_factor", 0.08D, 0.0D, 1.0D);
+
+        END_COOL_TINT = BUILDER
+                .comment("Cool (starlight blue) tint applied in darker End areas.")
+                .translation("selas.configuration.end_cool_tint")
+                .defineInRange("end_cool_tint", 0.04D, 0.0D, 0.5D);
 
         BUILDER.pop();
 
@@ -131,7 +169,7 @@ public final class SelasClientConfig {
         MOONLESS_NIGHT_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a new moon. Lower values make moonless nights darker.")
                 .translation("selas.configuration.moonless_night_sky_factor")
-                .defineInRange("moonless_night_sky_factor", 0.03D, 0.0D, 1.0D);
+                .defineInRange("moonless_night_sky_factor", 0.05D, 0.0D, 1.0D);
 
         FULL_MOON_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a full moon. Higher values make full-moon nights brighter.")
@@ -163,7 +201,7 @@ public final class SelasClientConfig {
         MINIMUM_LUMINANCE_FLOOR = BUILDER
                 .comment("Lowest general brightness Selas allows. 0 allows true black.")
                 .translation("selas.configuration.minimum_luminance_floor")
-                .defineInRange("minimum_luminance_floor", 0.006D, 0.0D, 0.25D);
+                .defineInRange("minimum_luminance_floor", 0.008D, 0.0D, 0.25D);
 
         CAVE_LUMINANCE_FLOOR = BUILDER
                 .comment("Lowest brightness used when both block light and sky light are low.")

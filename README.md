@@ -27,6 +27,8 @@ It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla
 - block light preservation
 - low-light desaturation
 - low-light cool tint
+- Nether and End lighting (warm Nether ambient, cool End starlight)
+- optional brightness-slider (gamma) handling
 
 ---
 
@@ -43,6 +45,7 @@ The config is split into sections:
 ```text
 natural_darkness.general
 natural_darkness.dimensions
+natural_darkness.dimension_lighting
 natural_darkness.twilight
 natural_darkness.natural_light
 natural_darkness.darkness

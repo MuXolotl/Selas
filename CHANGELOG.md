@@ -5,11 +5,15 @@
 ### Added
 
 - Configurable moon phase response curve for tuning brightness between new and full moon.
+- Separate Nether and End lighting so they are no longer pitch black: a warm Nether ambient and a cool End starlight tint, both configurable.
+- Optional brightness-slider (gamma) handling so the slider can still brighten the world while Selas is active.
 
 ### Changed
 
 - Increased natural sky brightness during lunar phases, especially during full moon and intermediate phases.
 - Improved sky and block light composition.
+- Nether and End no longer use the generic skyless profile.
+- Slightly raised the default minimum brightness so nights read as moonlit rather than cave-dark.
 
 ### Fixed
 

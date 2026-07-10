@@ -27,6 +27,7 @@ public final class SelasLightmap {
     private SelasLightmap() {
     }
 
+
     public static boolean shouldUpdateEveryFrame() {
         if (!SelasClientConfig.ENABLED.getAsBoolean() || !SelasClientConfig.SMOOTH_LIGHTMAP_UPDATES.getAsBoolean()) {
             return false;
@@ -50,6 +51,7 @@ public final class SelasLightmap {
         if (level == null || player == null || !shouldAffect(level, player)) {
             return;
         }
+
 
         LightingContext context = LightingContext.create(level, partialTick);
 
@@ -98,7 +100,7 @@ public final class SelasLightmap {
         float floor = context.floor(block, sky);
         float curve = (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble();
         float targetLuminance = floor + (1.0F - floor) * (float) Math.pow(saturate(effectiveLight), curve);
-        targetLuminance = saturate(targetLuminance);
+        targetLuminance = saturate(targetLuminance + context.baseAmbient());
 
         float r = (color & 0xFF) / 255.0F;
         float g = ((color >>> 8) & 0xFF) / 255.0F;
@@ -129,6 +131,28 @@ public final class SelasLightmap {
             b = b * (1.0F - coolTint * 0.08F) + coolTint * 0.018F;
         }
 
+        float warmTint = darkness * context.warmTint();
+        if (warmTint > 0.0F) {
+            r *= 1.0F - 0.15F * warmTint;
+            g *= 1.0F - 0.30F * warmTint;
+            b *= 1.0F - 0.50F * warmTint;
+        }
+
+        float endCoolTint = darkness * context.coolTint();
+        if (endCoolTint > 0.0F) {
+            r *= 1.0F - 0.50F * endCoolTint;
+            g *= 1.0F - 0.25F * endCoolTint;
+        }
+
+        if (SelasClientConfig.RESPECT_GAMMA.getAsBoolean()) {
+            float gamma = Minecraft.getInstance().options.gamma().get().floatValue();
+            if (gamma > 0.0F) {
+                r = applyVanillaGamma(r, gamma);
+                g = applyVanillaGamma(g, gamma);
+                b = applyVanillaGamma(b, gamma);
+            }
+        }
+
         return toNativeImageColor(a, r, g, b);
     }
 
@@ -152,11 +176,27 @@ public final class SelasLightmap {
         return saturate(block + sky - block * sky);
     }
 
-    private record LightingContext(float skyFactor, float nightAmount, boolean skyless) {
+    private static float applyVanillaGamma(float value, float gamma) {
+        float x = saturate(value);
+        float inv = 1.0F - x;
+        inv = 1.0F - inv * inv * inv * inv;
+        return x * (1.0F - gamma) + inv * gamma;
+    }
+
+    private record LightingContext(float skyFactor, float nightAmount, boolean skyless, float baseAmbient, float warmTint, float coolTint) {
         private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
+                ResourceKey<Level> dimension = level.dimension();
+                if (dimension == Level.NETHER) {
+                    float nether = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
+                    return new LightingContext(nether, 0.0F, true, nether, (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(), 0.0F);
+                }
+                if (dimension == Level.END) {
+                    float end = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
+                    return new LightingContext(end, 0.0F, true, end, 0.0F, (float) SelasClientConfig.END_COOL_TINT.getAsDouble());
+                }
                 float factor = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
-                return new LightingContext(factor, 1.0F, true);
+                return new LightingContext(factor, 1.0F, true, 0.0F, 0.0F, 0.0F);
             }
 
             float dayTick = positiveModulo((level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
@@ -178,7 +218,7 @@ public final class SelasLightmap {
 
             float naturalSkyFactor = Mth.lerp(night, 1.0F, lunarFactor);
             float skyFactor = naturalSkyFactor * weather;
-            return new LightingContext(saturate(skyFactor), night, false);
+            return new LightingContext(saturate(skyFactor), night, false, 0.0F, 0.0F, 0.0F);
         }
 
         private float floor(float block, float sky) {
