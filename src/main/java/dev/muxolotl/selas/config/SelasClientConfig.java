@@ -22,6 +22,7 @@ public final class SelasClientConfig {
 
     public static final ModConfigSpec.DoubleValue MOONLESS_NIGHT_SKY_FACTOR;
     public static final ModConfigSpec.DoubleValue FULL_MOON_SKY_FACTOR;
+    public static final ModConfigSpec.DoubleValue MOON_PHASE_CURVE;
     public static final ModConfigSpec.DoubleValue RAIN_DARKENING;
     public static final ModConfigSpec.DoubleValue THUNDER_DARKENING;
 
@@ -130,12 +131,17 @@ public final class SelasClientConfig {
         MOONLESS_NIGHT_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a new moon. Lower values make moonless nights darker.")
                 .translation("selas.configuration.moonless_night_sky_factor")
-                .defineInRange("moonless_night_sky_factor", 0.018D, 0.0D, 1.0D);
+                .defineInRange("moonless_night_sky_factor", 0.03D, 0.0D, 1.0D);
 
         FULL_MOON_SKY_FACTOR = BUILDER
-                .comment("Sky brightness at midnight during a full moon. Lower values make full-moon nights darker.")
+                .comment("Sky brightness at midnight during a full moon. Higher values make full-moon nights brighter.")
                 .translation("selas.configuration.full_moon_sky_factor")
-                .defineInRange("full_moon_sky_factor", 0.105D, 0.0D, 1.0D);
+                .defineInRange("full_moon_sky_factor", 0.30D, 0.0D, 1.0D);
+
+        MOON_PHASE_CURVE = BUILDER
+                .comment("Controls the progression between new moon and full moon. 1 is linear; lower values brighten intermediate phases.")
+                .translation("selas.configuration.moon_phase_curve")
+                .defineInRange("moon_phase_curve", 0.6D, 0.5D, 3.0D);
 
         RAIN_DARKENING = BUILDER
                 .comment("Natural sky darkening when rain is at full strength.")

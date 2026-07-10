@@ -160,7 +160,9 @@ public final class SelasLightmap {
             float moon = saturate(level.getMoonBrightness());
             float moonless = (float) SelasClientConfig.MOONLESS_NIGHT_SKY_FACTOR.getAsDouble();
             float fullMoon = (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble();
-            float lunarFactor = Mth.lerp(moon * moon, moonless, fullMoon);
+            float moonCurve = (float) SelasClientConfig.MOON_PHASE_CURVE.getAsDouble();
+            float moonPhaseProgress = saturate((float) Math.pow(moon, moonCurve));
+            float lunarFactor = Mth.lerp(moonPhaseProgress, moonless, fullMoon);
 
             float rain = saturate(level.getRainLevel(partialTick));
             float thunder = saturate(level.getThunderLevel(partialTick));

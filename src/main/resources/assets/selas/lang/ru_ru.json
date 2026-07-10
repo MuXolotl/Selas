@@ -21,6 +21,7 @@
   "selas.configuration.dawn_transition_end_tick": "Тик конца утреннего осветления",
   "selas.configuration.moonless_night_sky_factor": "Яркость новолуния",
   "selas.configuration.full_moon_sky_factor": "Яркость полнолуния",
+  "selas.configuration.moon_phase_curve": "Кривая изменения яркости фаз Луны",
   "selas.configuration.rain_darkening": "Затемнение дождём",
   "selas.configuration.thunder_darkening": "Затемнение грозой",
   "selas.configuration.minimum_luminance_floor": "Минимальный порог яркости",

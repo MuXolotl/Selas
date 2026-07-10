@@ -2,12 +2,20 @@
 
 ## 0.1.1
 
+### Added
+
+- Configurable moon phase response curve for tuning brightness between new and full moon.
+
+### Changed
+
+- Increased natural sky brightness during lunar phases, especially during full moon and intermediate phases.
+
 ### Fixed
 
-- Rain and thunder now darken the natural sky during daytime as well as at night.
-- Rain and thunder transitions now use the current render partial tick.
-- Rain and thunder no longer stack their full penalties, keeping storms visibly brighter than night.
-- Invalid twilight tick ordering now falls back to the default day/night schedule with a warning.
+- Rain and thunder now darken the natural sky during daytime.
+- Weather transitions now use the current render partial tick.
+- Rain and thunder darkening no longer stacks.
+- Invalid twilight schedules now fall back to the default values.
 
 ## 0.1.0
 

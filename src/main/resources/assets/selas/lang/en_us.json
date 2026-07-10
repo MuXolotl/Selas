@@ -21,6 +21,7 @@
   "selas.configuration.dawn_transition_end_tick": "Dawn fade end tick",
   "selas.configuration.moonless_night_sky_factor": "New moon brightness",
   "selas.configuration.full_moon_sky_factor": "Full moon brightness",
+  "selas.configuration.moon_phase_curve": "Moon phase progression curve",
   "selas.configuration.rain_darkening": "Rain darkening",
   "selas.configuration.thunder_darkening": "Thunder darkening",
   "selas.configuration.minimum_luminance_floor": "Minimum brightness floor",
