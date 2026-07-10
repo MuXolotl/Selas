@@ -2,9 +2,10 @@
 
 ## 0.1.x
 
-- Fix bugs from the first release.
-- Adjust default values if needed.
-- Improve shader compatibility notes.
+- Polish natural darkness defaults.
+- Fix bugs from early releases.
+- Improve shader compatibility behavior and notes.
+- Keep Nether / End readable and distinct.
 
 ## 0.2
 
@@ -16,5 +17,6 @@ Eye adaptation.
 
 ## Later
 
+- Color temperature / grading controls.
 - Optional day length changes.
 - Dynamic light support.

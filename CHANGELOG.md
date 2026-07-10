@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.2
+
+### Added
+
+- Open-sky starlight luminance floor (`starlight_luminance_floor`).
+- Auto-disable while an Iris/Oculus shader pack is active (`disable_with_shaders`, on by default).
+
+### Changed
+
+- Recalibrated default natural darkness toward realistic moonlit nights instead of near-void black:
+  - higher new-moon and full-moon sky factors
+  - clearer separation between cave floor and open-sky floor
+  - slightly softer darkness curve and night color grading
+  - slightly brighter Nether / End ambient defaults
+- When `respect_gamma` is enabled, the brightness slider lifts Selas target luminance only (no second gamma pass on lightmap RGB).
+- Nether, End, and other skyless dimensions use ambient base light only.
+
+### Fixed
+
+- Double gamma application when `respect_gamma` was enabled.
+- Redundant skyless floor calculation.
+
 ## 0.1.1
 
 ### Added

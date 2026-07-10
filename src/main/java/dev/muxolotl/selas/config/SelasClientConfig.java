@@ -10,6 +10,7 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.BooleanValue RESPECT_NIGHT_VISION;
     public static final ModConfigSpec.BooleanValue RESPECT_LIGHTNING_FLASHES;
     public static final ModConfigSpec.BooleanValue RESPECT_GAMMA;
+    public static final ModConfigSpec.BooleanValue DISABLE_WITH_SHADERS;
 
     public static final ModConfigSpec.BooleanValue AFFECT_OVERWORLD;
     public static final ModConfigSpec.BooleanValue AFFECT_CUSTOM_SKY_DIMENSIONS;
@@ -34,6 +35,7 @@ public final class SelasClientConfig {
 
     public static final ModConfigSpec.DoubleValue MINIMUM_LUMINANCE_FLOOR;
     public static final ModConfigSpec.DoubleValue CAVE_LUMINANCE_FLOOR;
+    public static final ModConfigSpec.DoubleValue STARLIGHT_LUMINANCE_FLOOR;
     public static final ModConfigSpec.DoubleValue DARKNESS_CURVE;
     public static final ModConfigSpec.DoubleValue BLOCK_LIGHT_PRESERVATION;
 
@@ -74,9 +76,21 @@ public final class SelasClientConfig {
                 .define("respect_lightning_flashes", true);
 
         RESPECT_GAMMA = BUILDER
-                .comment("Lets the brightness slider (gamma) still brighten the world while Selas is active. Off keeps Selas's darkness consistent regardless of the slider.")
+                .comment(
+                        "When true, the brightness slider lifts Selas target brightness (no double-gamma on already-baked lightmap pixels). ",
+                        "When false, Selas keeps its absolute luminance targets so the slider cannot wash out nights and caves. ",
+                        "A small residual slider effect can still appear in already-bright areas because vanilla applies gamma before Selas runs."
+                )
                 .translation("selas.configuration.respect_gamma")
                 .define("respect_gamma", false);
+
+        DISABLE_WITH_SHADERS = BUILDER
+                .comment(
+                        "When true, Selas skips lightmap changes while an Iris/Oculus shader pack is in use. ",
+                        "Shader packs usually replace vanilla lightmap lighting, so leaving Selas on only wastes work and confuses tuning."
+                )
+                .translation("selas.configuration.disable_with_shaders")
+                .define("disable_with_shaders", true);
 
         BUILDER.pop();
 
@@ -96,14 +110,14 @@ public final class SelasClientConfig {
                 .define("affect_custom_sky_dimensions", true);
 
         AFFECT_SKYLESS_DIMENSIONS = BUILDER
-                .comment("Applies the effect in dimensions without skylight (other than the Nether and End).")
+                .comment("Applies the effect in dimensions without skylight, including the Nether, the End, and modded skyless dimensions.")
                 .translation("selas.configuration.affect_skyless_dimensions")
                 .define("affect_skyless_dimensions", true);
 
         SKYLESS_DIMENSION_LIGHT_FACTOR = BUILDER
-                .comment("Brightness factor used where there is no sun or moon and the dimension is neither the Nether nor the End. Lower values make those dimensions darker.")
+                .comment("Base ambient brightness for modded dimensions with no sun/moon that are neither the Nether nor the End.")
                 .translation("selas.configuration.skyless_dimension_light_factor")
-                .defineInRange("skyless_dimension_light_factor", 0.09D, 0.0D, 1.0D);
+                .defineInRange("skyless_dimension_light_factor", 0.10D, 0.0D, 1.0D);
 
         BUILDER.pop();
 
@@ -115,22 +129,22 @@ public final class SelasClientConfig {
         NETHER_LIGHT_FACTOR = BUILDER
                 .comment("Base ambient brightness added across the Nether. Higher values make the Nether more playable but less moody.")
                 .translation("selas.configuration.nether_light_factor")
-                .defineInRange("nether_light_factor", 0.12D, 0.0D, 1.0D);
+                .defineInRange("nether_light_factor", 0.14D, 0.0D, 1.0D);
 
         NETHER_WARM_TINT = BUILDER
                 .comment("Warm (reddish/orange) tint applied in darker Nether areas, evoking lava and fire glow.")
                 .translation("selas.configuration.nether_warm_tint")
-                .defineInRange("nether_warm_tint", 0.05D, 0.0D, 0.5D);
+                .defineInRange("nether_warm_tint", 0.06D, 0.0D, 0.5D);
 
         END_LIGHT_FACTOR = BUILDER
                 .comment("Base ambient brightness added across the End. Higher values make the void more visible.")
                 .translation("selas.configuration.end_light_factor")
-                .defineInRange("end_light_factor", 0.08D, 0.0D, 1.0D);
+                .defineInRange("end_light_factor", 0.09D, 0.0D, 1.0D);
 
         END_COOL_TINT = BUILDER
                 .comment("Cool (starlight blue) tint applied in darker End areas.")
                 .translation("selas.configuration.end_cool_tint")
-                .defineInRange("end_cool_tint", 0.04D, 0.0D, 0.5D);
+                .defineInRange("end_cool_tint", 0.05D, 0.0D, 0.5D);
 
         BUILDER.pop();
 
@@ -167,19 +181,19 @@ public final class SelasClientConfig {
                 .push("natural_light");
 
         MOONLESS_NIGHT_SKY_FACTOR = BUILDER
-                .comment("Sky brightness at midnight during a new moon. Lower values make moonless nights darker.")
+                .comment("Sky brightness at midnight during a new moon. Lower values make moonless nights darker. Keep above cave darkness for open sky.")
                 .translation("selas.configuration.moonless_night_sky_factor")
-                .defineInRange("moonless_night_sky_factor", 0.05D, 0.0D, 1.0D);
+                .defineInRange("moonless_night_sky_factor", 0.09D, 0.0D, 1.0D);
 
         FULL_MOON_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a full moon. Higher values make full-moon nights brighter.")
                 .translation("selas.configuration.full_moon_sky_factor")
-                .defineInRange("full_moon_sky_factor", 0.30D, 0.0D, 1.0D);
+                .defineInRange("full_moon_sky_factor", 0.32D, 0.0D, 1.0D);
 
         MOON_PHASE_CURVE = BUILDER
                 .comment("Controls the progression between new moon and full moon. 1 is linear; lower values brighten intermediate phases.")
                 .translation("selas.configuration.moon_phase_curve")
-                .defineInRange("moon_phase_curve", 0.6D, 0.5D, 3.0D);
+                .defineInRange("moon_phase_curve", 0.65D, 0.5D, 3.0D);
 
         RAIN_DARKENING = BUILDER
                 .comment("Natural sky darkening when rain is at full strength.")
@@ -199,19 +213,27 @@ public final class SelasClientConfig {
                 .push("darkness");
 
         MINIMUM_LUMINANCE_FLOOR = BUILDER
-                .comment("Lowest general brightness Selas allows. 0 allows true black.")
+                .comment("Lowest general brightness Selas allows in mixed light. 0 allows true black.")
                 .translation("selas.configuration.minimum_luminance_floor")
-                .defineInRange("minimum_luminance_floor", 0.008D, 0.0D, 0.25D);
+                .defineInRange("minimum_luminance_floor", 0.010D, 0.0D, 0.25D);
 
         CAVE_LUMINANCE_FLOOR = BUILDER
-                .comment("Lowest brightness used when both block light and sky light are low.")
+                .comment("Lowest brightness when both block light and sky light are low (deep caves / sealed spaces). Should stay below open-sky starlight.")
                 .translation("selas.configuration.cave_luminance_floor")
-                .defineInRange("cave_luminance_floor", 0.003D, 0.0D, 0.25D);
+                .defineInRange("cave_luminance_floor", 0.002D, 0.0D, 0.25D);
+
+        STARLIGHT_LUMINANCE_FLOOR = BUILDER
+                .comment(
+                        "Extra luminance floor mixed in for open sky at night (starlight / airglow). ",
+                        "Uses sky light presence so caves stay darker than moonless surface nights. 0 disables the extra floor."
+                )
+                .translation("selas.configuration.starlight_luminance_floor")
+                .defineInRange("starlight_luminance_floor", 0.012D, 0.0D, 0.25D);
 
         DARKNESS_CURVE = BUILDER
                 .comment("Controls how quickly low light falls into darkness. Higher values make low light darker.")
                 .translation("selas.configuration.darkness_curve")
-                .defineInRange("darkness_curve", 1.72D, 0.25D, 4.0D);
+                .defineInRange("darkness_curve", 1.65D, 0.25D, 4.0D);
 
         BLOCK_LIGHT_PRESERVATION = BUILDER
                 .comment("Controls how much block light resists darkening. Higher values keep torches and lava brighter.")
@@ -228,12 +250,12 @@ public final class SelasClientConfig {
         NIGHT_DESATURATION = BUILDER
                 .comment("Removes color in darker areas. 0 disables this.")
                 .translation("selas.configuration.night_desaturation")
-                .defineInRange("night_desaturation", 0.34D, 0.0D, 1.0D);
+                .defineInRange("night_desaturation", 0.30D, 0.0D, 1.0D);
 
         NIGHT_COOL_TINT = BUILDER
                 .comment("Adds a small blue/cold tint in low natural light. 0 disables this.")
                 .translation("selas.configuration.night_cool_tint")
-                .defineInRange("night_cool_tint", 0.055D, 0.0D, 0.5D);
+                .defineInRange("night_cool_tint", 0.05D, 0.0D, 0.5D);
 
         BUILDER.pop();
         BUILDER.pop();

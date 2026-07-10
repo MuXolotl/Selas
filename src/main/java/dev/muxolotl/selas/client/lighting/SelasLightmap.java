@@ -2,6 +2,7 @@ package dev.muxolotl.selas.client.lighting;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.muxolotl.selas.Selas;
+import dev.muxolotl.selas.client.compat.ShaderPackCompat;
 import dev.muxolotl.selas.config.SelasClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -27,7 +28,6 @@ public final class SelasLightmap {
     private SelasLightmap() {
     }
 
-
     public static boolean shouldUpdateEveryFrame() {
         if (!SelasClientConfig.ENABLED.getAsBoolean() || !SelasClientConfig.SMOOTH_LIGHTMAP_UPDATES.getAsBoolean()) {
             return false;
@@ -52,7 +52,6 @@ public final class SelasLightmap {
             return;
         }
 
-
         LightingContext context = LightingContext.create(level, partialTick);
 
         for (int blockIndex = 0; blockIndex < 16; blockIndex++) {
@@ -65,6 +64,10 @@ public final class SelasLightmap {
     }
 
     private static boolean shouldAffect(ClientLevel level, LocalPlayer player) {
+        if (SelasClientConfig.DISABLE_WITH_SHADERS.getAsBoolean() && ShaderPackCompat.isShaderPackInUse()) {
+            return false;
+        }
+
         if (SelasClientConfig.RESPECT_NIGHT_VISION.getAsBoolean()) {
             boolean hasNightVision = player.hasEffect(MobEffects.NIGHT_VISION);
             boolean hasUsefulConduitVision = player.hasEffect(MobEffects.CONDUIT_POWER) && player.getWaterVision() > 0.0F;
@@ -101,6 +104,7 @@ public final class SelasLightmap {
         float curve = (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble();
         float targetLuminance = floor + (1.0F - floor) * (float) Math.pow(saturate(effectiveLight), curve);
         targetLuminance = saturate(targetLuminance + context.baseAmbient());
+        targetLuminance = applyGammaToTarget(targetLuminance);
 
         float r = (color & 0xFF) / 255.0F;
         float g = ((color >>> 8) & 0xFF) / 255.0F;
@@ -144,16 +148,20 @@ public final class SelasLightmap {
             g *= 1.0F - 0.25F * endCoolTint;
         }
 
-        if (SelasClientConfig.RESPECT_GAMMA.getAsBoolean()) {
-            float gamma = Minecraft.getInstance().options.gamma().get().floatValue();
-            if (gamma > 0.0F) {
-                r = applyVanillaGamma(r, gamma);
-                g = applyVanillaGamma(g, gamma);
-                b = applyVanillaGamma(b, gamma);
-            }
+        return toNativeImageColor(a, r, g, b);
+    }
+
+    private static float applyGammaToTarget(float targetLuminance) {
+        if (!SelasClientConfig.RESPECT_GAMMA.getAsBoolean()) {
+            return targetLuminance;
         }
 
-        return toNativeImageColor(a, r, g, b);
+        float gamma = Minecraft.getInstance().options.gamma().get().floatValue();
+        if (gamma <= 0.0F) {
+            return targetLuminance;
+        }
+
+        return applyVanillaGamma(targetLuminance, saturate(gamma));
     }
 
     private static float luminance(float r, float g, float b) {
@@ -183,20 +191,41 @@ public final class SelasLightmap {
         return x * (1.0F - gamma) + inv * gamma;
     }
 
-    private record LightingContext(float skyFactor, float nightAmount, boolean skyless, float baseAmbient, float warmTint, float coolTint) {
+    private record LightingContext(
+            float skyFactor,
+            float nightAmount,
+            boolean skyless,
+            float baseAmbient,
+            float warmTint,
+            float coolTint
+    ) {
         private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
                 ResourceKey<Level> dimension = level.dimension();
                 if (dimension == Level.NETHER) {
                     float nether = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
-                    return new LightingContext(nether, 0.0F, true, nether, (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(), 0.0F);
+                    return new LightingContext(
+                            0.0F,
+                            0.0F,
+                            true,
+                            nether,
+                            (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(),
+                            0.0F
+                    );
                 }
                 if (dimension == Level.END) {
                     float end = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
-                    return new LightingContext(end, 0.0F, true, end, 0.0F, (float) SelasClientConfig.END_COOL_TINT.getAsDouble());
+                    return new LightingContext(
+                            0.0F,
+                            0.0F,
+                            true,
+                            end,
+                            0.0F,
+                            (float) SelasClientConfig.END_COOL_TINT.getAsDouble()
+                    );
                 }
                 float factor = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
-                return new LightingContext(factor, 1.0F, true, 0.0F, 0.0F, 0.0F);
+                return new LightingContext(0.0F, 1.0F, true, factor, 0.0F, 0.0F);
             }
 
             float dayTick = positiveModulo((level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
@@ -224,12 +253,23 @@ public final class SelasLightmap {
         private float floor(float block, float sky) {
             float generalFloor = (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble();
             if (skyless) {
-                return Math.max(generalFloor, generalFloor * 1.5F);
+                return generalFloor;
             }
 
             float caveFloor = (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble();
-            float lowLight = 1.0F - combineLightContributions(saturate(block), saturate(sky));
-            return Mth.lerp(lowLight, generalFloor, Math.min(generalFloor, caveFloor));
+            float starlightFloor = (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble();
+
+            float totalLight = combineLightContributions(saturate(block), saturate(sky));
+            float lowLight = 1.0F - totalLight;
+            float base = Mth.lerp(lowLight, generalFloor, Math.min(generalFloor, caveFloor));
+
+            if (starlightFloor > 0.0F && nightAmount() > 0.0F) {
+                float openSky = saturate(sky);
+                float starlight = starlightFloor * openSky * nightAmount();
+                base = Math.max(base, starlight);
+            }
+
+            return base;
         }
     }
 
