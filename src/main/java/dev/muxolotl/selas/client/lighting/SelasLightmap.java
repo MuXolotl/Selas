@@ -1,6 +1,7 @@
 package dev.muxolotl.selas.client.lighting;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import dev.muxolotl.selas.Selas;
 import dev.muxolotl.selas.config.SelasClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -15,6 +16,13 @@ public final class SelasLightmap {
     private static final float LUMINANCE_G = 0.7152F;
     private static final float LUMINANCE_B = 0.0722F;
     private static final float MINECRAFT_DAY_TICKS = 24000.0F;
+
+    private static final int DEFAULT_DUSK_TRANSITION_START_TICK = 11800;
+    private static final int DEFAULT_FULL_NIGHT_START_TICK = 14000;
+    private static final int DEFAULT_FULL_NIGHT_END_TICK = 21200;
+    private static final int DEFAULT_DAWN_TRANSITION_END_TICK = 400;
+
+    private static String lastInvalidTwilightValues;
 
     private SelasLightmap() {
     }
@@ -154,15 +162,16 @@ public final class SelasLightmap {
             float fullMoon = (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble();
             float lunarFactor = Mth.lerp(moon * moon, moonless, fullMoon);
 
-            float rain = level.getRainLevel(1.0F);
-            float thunder = level.getThunderLevel(1.0F);
-            float weather = 1.0F
-                    - rain * (float) SelasClientConfig.RAIN_DARKENING.getAsDouble()
-                    - thunder * (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble();
+            float rain = saturate(level.getRainLevel(partialTick));
+            float thunder = saturate(level.getThunderLevel(partialTick));
+            float rainDarkening = rain * (float) SelasClientConfig.RAIN_DARKENING.getAsDouble();
+            float thunderDarkening = thunder * (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble();
+
+            float weather = 1.0F - Math.max(rainDarkening, thunderDarkening);
             weather = saturate(weather);
 
-            float nightSky = lunarFactor * weather;
-            float skyFactor = Mth.lerp(night, 1.0F, nightSky);
+            float naturalSkyFactor = Mth.lerp(night, 1.0F, lunarFactor);
+            float skyFactor = naturalSkyFactor * weather;
             return new LightingContext(saturate(skyFactor), night, false);
         }
 
@@ -179,10 +188,11 @@ public final class SelasLightmap {
     }
 
     private static float calculateNightAmount(float dayTick) {
-        float duskStart = SelasClientConfig.DUSK_TRANSITION_START_TICK.get();
-        float fullNightStart = SelasClientConfig.FULL_NIGHT_START_TICK.get();
-        float fullNightEnd = SelasClientConfig.FULL_NIGHT_END_TICK.get();
-        float dawnEnd = SelasClientConfig.DAWN_TRANSITION_END_TICK.get();
+        TwilightTimes twilight = getTwilightTimes();
+        float duskStart = twilight.duskStart();
+        float fullNightStart = twilight.fullNightStart();
+        float fullNightEnd = twilight.fullNightEnd();
+        float dawnEnd = twilight.dawnEnd();
 
         if (isInWrappedRange(dayTick, duskStart, fullNightStart)) {
             return smootherStep(progressInWrappedRange(dayTick, duskStart, fullNightStart));
@@ -197,6 +207,36 @@ public final class SelasLightmap {
         }
 
         return 0.0F;
+    }
+
+    private static TwilightTimes getTwilightTimes() {
+        int duskStart = SelasClientConfig.DUSK_TRANSITION_START_TICK.get();
+        int fullNightStart = SelasClientConfig.FULL_NIGHT_START_TICK.get();
+        int fullNightEnd = SelasClientConfig.FULL_NIGHT_END_TICK.get();
+        int dawnEnd = SelasClientConfig.DAWN_TRANSITION_END_TICK.get();
+
+        if (dawnEnd < duskStart && duskStart < fullNightStart && fullNightStart < fullNightEnd) {
+            return new TwilightTimes(duskStart, fullNightStart, fullNightEnd, dawnEnd);
+        }
+
+        String invalidValues = duskStart + ", " + fullNightStart + ", " + fullNightEnd + ", " + dawnEnd;
+        if (!invalidValues.equals(lastInvalidTwilightValues)) {
+            Selas.LOGGER.warn(
+                    "Invalid Selas twilight tick order: dusk={}, fullNightStart={}, fullNightEnd={}, dawn={}. Using defaults.",
+                    duskStart, fullNightStart, fullNightEnd, dawnEnd
+            );
+            lastInvalidTwilightValues = invalidValues;
+        }
+
+        return new TwilightTimes(
+                DEFAULT_DUSK_TRANSITION_START_TICK,
+                DEFAULT_FULL_NIGHT_START_TICK,
+                DEFAULT_FULL_NIGHT_END_TICK,
+                DEFAULT_DAWN_TRANSITION_END_TICK
+        );
+    }
+
+    private record TwilightTimes(int duskStart, int fullNightStart, int fullNightEnd, int dawnEnd) {
     }
 
     private static boolean isInWrappedRange(float value, float start, float end) {

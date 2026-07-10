@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.1
+
+### Fixed
+
+- Rain and thunder now darken the natural sky during daytime as well as at night.
+- Rain and thunder transitions now use the current render partial tick.
+- Rain and thunder no longer stack their full penalties, keeping storms visibly brighter than night.
+- Invalid twilight tick ordering now falls back to the default day/night schedule with a warning.
+
 ## 0.1.0
 
 Initial client-side darkness module.

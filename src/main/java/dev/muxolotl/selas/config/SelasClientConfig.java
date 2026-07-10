@@ -138,12 +138,12 @@ public final class SelasClientConfig {
                 .defineInRange("full_moon_sky_factor", 0.105D, 0.0D, 1.0D);
 
         RAIN_DARKENING = BUILDER
-                .comment("Extra darkening when rain is at full strength.")
+                .comment("Natural sky darkening when rain is at full strength.")
                 .translation("selas.configuration.rain_darkening")
                 .defineInRange("rain_darkening", 0.16D, 0.0D, 1.0D);
 
         THUNDER_DARKENING = BUILDER
-                .comment("Extra darkening when thunder is at full strength.")
+                .comment("Natural sky darkening when thunder is at full strength. Rain and thunder penalties do not stack.")
                 .translation("selas.configuration.thunder_darkening")
                 .defineInRange("thunder_darkening", 0.32D, 0.0D, 1.0D);
 
