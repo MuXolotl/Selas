@@ -4,9 +4,11 @@
 
 # ☀️ Selas 🌑
 
-Selas is a small client-side NeoForge mod for Minecraft 1.21.1.
+Selas is a client-side NeoForge mod for Minecraft 1.21.1.
 
-It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla lightmap. It aims for physically grounded darkness: sealed unlit spaces approach black, while open nights retain moonlight, starlight, and atmospheric glow. It does not add blocks, items, mobs, dimensions, dynamic lights, fog, or server-side time changes.
+It reworks Minecraft's vanilla lightmap to make nights, caves, rain, and thunder darker in a more natural and readable way. The goal is not pure black darkness, but lighting that feels more grounded: sealed unlit spaces should approach black, while open nights should still keep moonlight, starlight, and a little atmospheric glow.
+
+Selas does **not** add blocks, items, mobs, dimensions, fog systems, or dynamic lights. It is a visual lighting mod focused on the vanilla lightmap.
 
 ## Downloads
 
@@ -22,15 +24,41 @@ It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla
 - cave darkness
 - rain and thunder darkness
 - moon phase brightness
-- dusk and dawn transition timing
-- minimum brightness floor
+- dusk, full-night, and dawn timing
+- minimum brightness floors
 - open-sky starlight floor
 - block light preservation
 - low-light desaturation
 - low-light cool tint
-- Nether and End lighting (warm Nether ambient, cool End starlight)
+- Nether and End lighting (warm Nether ambient, cool End ambient)
 - optional brightness-slider (gamma) handling
 - optional auto-disable while a shader pack is active
+
+## What it does not change
+
+- day length
+- mob spawning
+- server time
+- block light propagation
+- sky rendering
+- fog rendering
+- dynamic lights
+- blocks, items, mobs, or dimensions
+
+---
+
+## How it works
+
+Selas post-processes Minecraft's vanilla lightmap after the game builds it. In practice, that means it can:
+
+- darken natural sky light more aggressively than vanilla
+- keep caves and sealed spaces much darker than open-sky night surfaces
+- preserve useful block light from torches, lava, and other emissive sources
+- react to moon phase, rain, thunder, and twilight timing
+- apply separate ambient handling for the Nether, the End, and other skyless dimensions
+- add small low-light color changes without replacing the entire renderer
+
+This is still a vanilla-lightmap approach, not a custom shader pack or dynamic-light engine.
 
 ---
 
@@ -42,7 +70,7 @@ Selas uses a client config file:
 config/selas-client.toml
 ```
 
-The config is split into sections:
+The config is organized under these sections:
 
 ```text
 natural_darkness.general
@@ -54,19 +82,47 @@ natural_darkness.darkness
 natural_darkness.color
 ```
 
-Selas does **not** ship presets or profiles. Change the values directly if the defaults do not fit your setup.
+### Section overview
 
-When updating from an earlier 0.1.x release, existing config values are preserved. To use the recalibrated 0.1.2 defaults, delete `config/selas-client.toml` once before starting the game and let Selas regenerate it.
+- `natural_darkness.general`  
+  Main switches and compatibility options, including enable/disable, smooth lightmap updates, Night Vision handling, lightning handling, gamma behavior, and shader-pack auto-disable.
 
-> [!Note]
->
-> Minecraft uses a small lightmap and 16 raw light levels. Some texture grain or shimmer during dusk and dawn is visible in vanilla too. Selas can make it easier to notice because the world is darker.
->
-> Shader packs usually replace vanilla lightmap lighting. By default Selas disables itself while an Iris/Oculus shader pack is active (`disable_with_shaders`). You can force Selas back on in the config if you are testing, but most packs will ignore or override the result.
->
-> The brightness slider (`respect_gamma`) works like this:
-> - **off (default):** Selas keeps its own darkness targets, so the slider cannot wash out nights and caves. Vanilla still builds the lightmap with gamma first, so in already-bright areas (daylight, strong block light) you may still notice a small slider effect. That residual is normal for lightmap post-processing, not a broken toggle.
-> - **on:** the slider is allowed to lift Selas target brightness in a controlled way (without double-applying gamma to RGB).
+- `natural_darkness.dimensions`  
+  Controls where Selas is active: Overworld, custom skylit dimensions, and skyless dimensions.
+
+- `natural_darkness.dimension_lighting`  
+  Separate ambient brightness and tint behavior for the Nether and the End.
+
+- `natural_darkness.twilight`  
+  Dusk, full-night, and dawn timing in Minecraft day ticks.
+
+- `natural_darkness.natural_light`  
+  Moon and weather response: new moon brightness, full moon brightness, moon phase curve, rain darkening, and thunder darkening.
+
+- `natural_darkness.darkness`  
+  Brightness floors, darkness curve, starlight floor, and block-light preservation.
+
+- `natural_darkness.color`  
+  Low-light desaturation and cool tint behavior.
+
+Selas does **not** use presets or profiles. Values are changed directly in the config.
+
+Selas keeps your existing config values when you update the mod. If you want to apply the current default settings, delete `config/selas-client.toml` once and let the game regenerate it.
+
+---
+
+## Compatibility notes
+
+Selas is a visual client-side mod. It can be used on servers because it does not change server logic, world time, spawning rules, or block light propagation.
+
+Shader packs usually replace or override vanilla lightmap lighting. Because of that, Selas disables itself by default while an Iris/Oculus shader pack is active (`disable_with_shaders`). You can force it back on in the config if you want to test behavior, but most shader packs will ignore or override the result.
+
+Minecraft's vanilla lightmap is small and only uses 16 raw light levels. That means visible grain or shimmer during dusk and dawn is still possible in vanilla, and Selas can make it easier to notice because darker scenes make the artifact more visible.
+
+The brightness slider option (`respect_gamma`) works like this:
+
+- **off (default):** Selas keeps its own darkness targets, so the slider cannot wash out nights and caves. Vanilla still builds the lightmap with gamma first, so in already bright areas (daylight, strong block light) you may still notice a small residual slider effect.
+- **on:** the slider is allowed to lift Selas target luminance in a controlled way, without applying a second gamma pass to the final RGB values.
 
 ---
 
