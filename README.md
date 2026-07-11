@@ -6,7 +6,7 @@
 
 Selas is a small client-side NeoForge mod for Minecraft 1.21.1.
 
-It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla lightmap. It aims for natural, readable darkness rather than pure black voids. It does not add blocks, items, mobs, dimensions, dynamic lights, fog, or server-side time changes.
+It makes nights, caves, rain, and thunder darker by changing Minecraft's vanilla lightmap. It aims for physically grounded darkness: sealed unlit spaces approach black, while open nights retain moonlight, starlight, and atmospheric glow. It does not add blocks, items, mobs, dimensions, dynamic lights, fog, or server-side time changes.
 
 ## Downloads
 
@@ -56,6 +56,8 @@ natural_darkness.color
 
 Selas does **not** ship presets or profiles. Change the values directly if the defaults do not fit your setup.
 
+When updating from an earlier 0.1.x release, existing config values are preserved. To use the recalibrated 0.1.2 defaults, delete `config/selas-client.toml` once before starting the game and let Selas regenerate it.
+
 > [!Note]
 >
 > Minecraft uses a small lightmap and 16 raw light levels. Some texture grain or shimmer during dusk and dawn is visible in vanilla too. Selas can make it easier to notice because the world is darker.
@@ -71,7 +73,7 @@ Selas does **not** ship presets or profiles. Change the values directly if the d
 ## Requirements
 
 - Minecraft 1.21.1
-- NeoForge
+- NeoForge 21.1.235 or newer
 - Java 21
 
 ## Building

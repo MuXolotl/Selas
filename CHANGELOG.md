@@ -9,9 +9,10 @@
 
 ### Changed
 
-- Recalibrated default natural darkness toward realistic moonlit nights instead of near-void black:
+- Recalibrated default natural darkness toward physically grounded lighting:
   - higher new-moon and full-moon sky factors
-  - clearer separation between cave floor and open-sky floor
+  - clearer separation between the near-black cave floor and open-sky starlight floor
+  - cave floor raised slightly to `0.005` to reduce black crush without adding visible ambient light
   - slightly softer darkness curve and night color grading
   - slightly brighter Nether / End ambient defaults
 - When `respect_gamma` is enabled, the brightness slider lifts Selas target luminance only (no second gamma pass on lightmap RGB).

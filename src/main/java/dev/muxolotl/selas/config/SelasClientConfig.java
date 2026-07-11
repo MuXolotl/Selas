@@ -218,9 +218,9 @@ public final class SelasClientConfig {
                 .defineInRange("minimum_luminance_floor", 0.010D, 0.0D, 0.25D);
 
         CAVE_LUMINANCE_FLOOR = BUILDER
-                .comment("Lowest brightness when both block light and sky light are low (deep caves / sealed spaces). Should stay below open-sky starlight.")
+                .comment("Near-black anti-crush floor when both block light and sky light are low (deep caves / sealed spaces). Should stay below open-sky starlight.")
                 .translation("selas.configuration.cave_luminance_floor")
-                .defineInRange("cave_luminance_floor", 0.002D, 0.0D, 0.25D);
+                .defineInRange("cave_luminance_floor", 0.005D, 0.0D, 0.25D);
 
         STARLIGHT_LUMINANCE_FLOOR = BUILDER
                 .comment(
