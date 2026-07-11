@@ -202,7 +202,7 @@ public final class SelasLightmap {
         private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
                 ResourceKey<Level> dimension = level.dimension();
-                if (dimension == Level.NETHER) {
+                if (dimension.equals(Level.NETHER)) {
                     float nether = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
                     return new LightingContext(
                             0.0F,
@@ -213,7 +213,7 @@ public final class SelasLightmap {
                             0.0F
                     );
                 }
-                if (dimension == Level.END) {
+                if (dimension.equals(Level.END)) {
                     float end = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
                     return new LightingContext(
                             0.0F,
