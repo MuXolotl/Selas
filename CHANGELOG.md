@@ -22,7 +22,6 @@
 
 - Double gamma application when `respect_gamma` was enabled.
 - Redundant skyless floor calculation.
-- Iris shader-pack status checks are now cached and more defensive.
 - Nether / End dimension routing now uses value equality for dimension keys.
 
 ## 0.1.1
