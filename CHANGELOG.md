@@ -1,65 +1,90 @@
 # Changelog
 
+All notable changes to Selas are documented here. Newest version first.
+
+Each release is split into two parts:
+
+- **Player-facing changes** come first — what actually changed in-game and what you will see or feel.
+- A collapsible **Technical / internal** section follows — code-level changes that do not affect gameplay.
+
+---
+
 ## 0.1.2
 
 ### Added
 
-- Open-sky starlight luminance floor (`starlight_luminance_floor`).
-- Auto-disable while an Iris/Oculus shader pack is active (`disable_with_shaders`, enabled by default).
+- Open night skies now keep a faint starlight glow instead of fading to pure black, so surface nights read as moonlit rather than blind-dark.
+- Selas now steps aside automatically while a shader pack is active, so it no longer fights your shaders. (You can force it back on in the config.)
 
 ### Changed
 
-- Recalibrated default natural darkness toward more physically grounded lighting:
-  - higher new-moon and full-moon sky factors
-  - clearer separation between near-black cave darkness and open-sky starlight
-  - cave floor raised slightly to reduce black crush without adding visible ambient light
-  - slightly softer darkness curve and night color grading
-  - slightly brighter Nether / End ambient defaults
-- When `respect_gamma` is enabled, the brightness slider now lifts Selas target luminance only.
-- Nether, End, and other skyless dimensions use ambient base light only.
+- Rebalanced the default night look toward something more natural:
+  - brighter, more believable moonlit and full-moon nights,
+  - a clearer difference between near-black caves and open, starlit surfaces,
+  - a gentler fade into darkness and softer night colors.
+- The Nether and End feel a little less flat, with slightly brighter ambient light so they are no longer pitch black.
+- When "let the brightness slider brighten" is enabled, the slider now lifts Selas' own brightness cleanly instead of stacking on top of the world.
 
 ### Fixed
 
-- Double gamma application when `respect_gamma` was enabled.
-- Redundant skyless floor calculation.
-- Nether / End dimension routing now uses value equality for dimension keys.
+- Fixed the brightness slider being able to wash out nights and caves twice when the gamma option was enabled.
+
+<details><summary>Technical / internal</summary>
+
+- Removed a redundant brightness-floor calculation for skyless dimensions.
+- Nether/End lighting is now routed by dimension-key value equality, fixing cases where their dedicated profile could be missed.
+- Skyless dimensions (Nether, End, and modded skyless worlds) now use ambient base light only.
+
+</details>
 
 ## 0.1.1
 
 ### Added
 
-- Configurable moon phase response curve for tuning brightness between new and full moon.
-- Separate Nether and End lighting so they are no longer pitch black: a warm Nether ambient and a cool End starlight tint, both configurable.
-- Optional brightness-slider (gamma) handling so the slider can still brighten the world while Selas is active.
+- The moon phase now has a tunable response curve, so brightness between new moon and full moon can be adjusted to taste.
+- The Nether and End are no longer pitch black: the Nether gets a warm ambient glow and the End a cool one, both adjustable.
+- Optional brightness-slider handling, so the slider can still brighten the world while Selas is active.
 
 ### Changed
 
-- Increased natural sky brightness during lunar phases, especially during full moon and intermediate phases.
-- Improved sky and block light composition.
-- Nether and End no longer use the generic skyless profile.
-- Slightly raised the default minimum brightness so nights read as moonlit rather than cave-dark.
+- Nights are brighter and more readable during lunar phases, especially around the full moon and the phases in between.
+- Improved how sky light and block light blend together.
+- Nights now read as moonlit rather than cave-dark by default.
 
 ### Fixed
 
-- Rain and thunder now darken the natural sky during daytime.
-- Weather transitions now use the current render partial tick.
-- Rain and thunder darkening no longer stacks.
-- Invalid twilight schedules now fall back to the default values.
+- Rain and thunder now correctly darken the sky during the daytime, not just at night.
+- Rain and thunder darkening no longer stack, so storms are no longer overly dark.
+- Weather brightness transitions are smoother.
+
+<details><summary>Technical / internal</summary>
+
+- The Nether and End no longer fall back to the generic skyless lighting profile.
+- Weather calculations now use the current render partial tick.
+- Invalid twilight tick schedules fall back to the default values, with a single warning logged.
+
+</details>
 
 ## 0.1.0
 
-Initial client-side darkness module.
+Initial release: a client-side, natural darkness module for the vanilla lightmap.
 
 ### Added
 
-- Lightmap-based night and cave darkening.
-- Configurable dusk, full-night and dawn timings.
-- Moon phase brightness settings.
-- Rain and thunder darkening settings.
-- Dimension toggles for Overworld, custom skylit dimensions and skyless dimensions.
-- Minimum brightness floor settings.
-- Block light preservation setting.
-- Low-light desaturation and cool tint settings.
-- Night Vision, Conduit Power vision and lightning flash compatibility toggles.
-- English and Russian config translations.
+- Darker, more natural nights and caves.
+- Configurable dusk, full-night, and dawn timing.
+- Moon phase brightness.
+- Rain and thunder darkening.
+- Per-dimension toggles for the Overworld, custom skylit dimensions, and skyless dimensions.
+- Minimum brightness floors so scenes never crush to unreadable black.
+- A block-light preservation setting, so torches and lava stay usefully bright.
+- Low-light desaturation and a cool tint for a more natural night mood.
+- Compatibility toggles for Night Vision, Conduit Power vision, and lightning flashes.
+- English and Russian translations for the config.
+
+<details><summary>Technical / internal</summary>
+
+- Lightmap post-processing via a single client mixin on `LightTexture`.
 - Grouped client config layout.
+
+</details>
