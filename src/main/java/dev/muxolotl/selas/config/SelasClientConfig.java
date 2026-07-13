@@ -42,6 +42,12 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.DoubleValue NIGHT_COOL_TINT;
     public static final ModConfigSpec.DoubleValue MOON_WARMTH;
 
+    public static final ModConfigSpec.BooleanValue ATMOSPHERE_ENABLED;
+    public static final ModConfigSpec.BooleanValue ATMOSPHERE_DISABLE_WITH_SHADERS;
+    public static final ModConfigSpec.BooleanValue ATMOSPHERE_AFFECT_OVERWORLD;
+    public static final ModConfigSpec.BooleanValue ATMOSPHERE_AFFECT_NETHER;
+    public static final ModConfigSpec.BooleanValue ATMOSPHERE_AFFECT_END;
+
     public static final ModConfigSpec SPEC;
 
     static {
@@ -255,6 +261,51 @@ public final class SelasClientConfig {
                 )
                 .translation("selas.configuration.moon_warmth")
                 .defineInRange("moon_warmth", 0.03D, 0.0D, 0.3D);
+
+        BUILDER.pop();
+        BUILDER.pop();
+
+        BUILDER
+                .comment("Atmospheric fog changes. Modifies vanilla fog color and distance to match Selas lighting.")
+                .translation("selas.configuration.section.atmosphere")
+                .push("atmosphere");
+
+        BUILDER
+                .comment("General switches for the atmosphere module.")
+                .translation("selas.configuration.section.atmosphere_general")
+                .push("general");
+
+        ATMOSPHERE_ENABLED = BUILDER
+                .comment("Turns the Selas atmospheric fog changes on or off.")
+                .translation("selas.configuration.atmosphere_enabled")
+                .define("atmosphere_enabled", true);
+
+        ATMOSPHERE_DISABLE_WITH_SHADERS = BUILDER
+                .comment("When true, Selas skips fog changes while an Iris/Oculus shader pack is in use.")
+                .translation("selas.configuration.atmosphere_disable_with_shaders")
+                .define("atmosphere_disable_with_shaders", true);
+
+        BUILDER.pop();
+
+        BUILDER
+                .comment("Where the atmosphere module is active.")
+                .translation("selas.configuration.section.atmosphere_dimensions")
+                .push("dimensions");
+
+        ATMOSPHERE_AFFECT_OVERWORLD = BUILDER
+                .comment("Applies fog changes in the Overworld.")
+                .translation("selas.configuration.atmosphere_affect_overworld")
+                .define("atmosphere_affect_overworld", true);
+
+        ATMOSPHERE_AFFECT_NETHER = BUILDER
+                .comment("Applies fog changes in the Nether.")
+                .translation("selas.configuration.atmosphere_affect_nether")
+                .define("atmosphere_affect_nether", true);
+
+        ATMOSPHERE_AFFECT_END = BUILDER
+                .comment("Applies fog changes in the End.")
+                .translation("selas.configuration.atmosphere_affect_end")
+                .define("atmosphere_affect_end", true);
 
         BUILDER.pop();
         BUILDER.pop();

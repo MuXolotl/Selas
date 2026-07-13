@@ -37,5 +37,13 @@
   "selas.configuration.block_light_preservation": "Сохранение блочного света",
   "selas.configuration.night_desaturation": "Десатурация при слабом свете",
   "selas.configuration.night_cool_tint": "Холодный оттенок при слабом свете",
-  "selas.configuration.moon_warmth": "Тёплый оттенок полнолуния"
+  "selas.configuration.moon_warmth": "Тёплый оттенок полнолуния",
+  "selas.configuration.section.atmosphere": "Атмосфера",
+  "selas.configuration.section.atmosphere_general": "Общее",
+  "selas.configuration.section.atmosphere_dimensions": "Измерения",
+  "selas.configuration.atmosphere_enabled": "Включено",
+  "selas.configuration.atmosphere_disable_with_shaders": "Отключать при активном шейдер-паке",
+  "selas.configuration.atmosphere_affect_overworld": "Влиять на Верхний мир",
+  "selas.configuration.atmosphere_affect_nether": "Влиять на Незер",
+  "selas.configuration.atmosphere_affect_end": "Влиять на Энд"
 }

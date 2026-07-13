@@ -37,5 +37,13 @@
   "selas.configuration.block_light_preservation": "Block light preservation",
   "selas.configuration.night_desaturation": "Low-light desaturation",
   "selas.configuration.night_cool_tint": "Low-light cool tint",
-  "selas.configuration.moon_warmth": "Full-moon warmth"
+  "selas.configuration.moon_warmth": "Full-moon warmth",
+  "selas.configuration.section.atmosphere": "Atmosphere",
+  "selas.configuration.section.atmosphere_general": "General",
+  "selas.configuration.section.atmosphere_dimensions": "Dimensions",
+  "selas.configuration.atmosphere_enabled": "Enabled",
+  "selas.configuration.atmosphere_disable_with_shaders": "Disable while shader pack is active",
+  "selas.configuration.atmosphere_affect_overworld": "Affect Overworld",
+  "selas.configuration.atmosphere_affect_nether": "Affect Nether",
+  "selas.configuration.atmosphere_affect_end": "Affect End"
 }
