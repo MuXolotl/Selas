@@ -104,7 +104,6 @@ public final class SelasLightmap {
         float curve = context.darknessCurve();
         float targetLuminance = floor + (1.0F - floor) * (float) Math.pow(saturate(effectiveLight), curve);
         targetLuminance = saturate(targetLuminance + context.baseAmbient());
-        targetLuminance = applyGammaToTarget(targetLuminance, context);
 
         float r = (color & 0xFF) / 255.0F;
         float g = ((color >>> 8) & 0xFF) / 255.0F;
@@ -159,18 +158,6 @@ public final class SelasLightmap {
         return toNativeImageColor(a, r, g, b);
     }
 
-    private static float applyGammaToTarget(float targetLuminance, LightingContext context) {
-        if (!context.gammaEnabled()) {
-            return targetLuminance;
-        }
-
-        float gamma = context.gammaValue();
-        if (gamma <= 0.0F) {
-            return targetLuminance;
-        }
-
-        return applyVanillaGamma(targetLuminance, saturate(gamma));
-    }
 
     private static float luminance(float r, float g, float b) {
         return r * LUMINANCE_R + g * LUMINANCE_G + b * LUMINANCE_B;
@@ -181,6 +168,7 @@ public final class SelasLightmap {
         int ri = Math.round(saturate(r) * 255.0F);
         int gi = Math.round(saturate(g) * 255.0F);
         int bi = Math.round(saturate(b) * 255.0F);
+        // NativeImage lightmap pixels are RGBA in memory, packed little-endian as 0xAABBGGRR.
         return (ai << 24) | ri | (gi << 8) | (bi << 16);
     }
 
@@ -192,12 +180,6 @@ public final class SelasLightmap {
         return saturate(block + sky - block * sky);
     }
 
-    private static float applyVanillaGamma(float value, float gamma) {
-        float x = saturate(value);
-        float inv = 1.0F - x;
-        inv = 1.0F - inv * inv * inv * inv;
-        return x * (1.0F - gamma) + inv * gamma;
-    }
 
     private record FrameSettings(
             float blockLightPreservation,
@@ -206,16 +188,9 @@ public final class SelasLightmap {
             float nightCoolTint,
             float minimumFloor,
             float caveFloor,
-            float starlightFloor,
-            boolean gammaEnabled,
-            float gammaValue
+            float starlightFloor
     ) {
         private static FrameSettings snapshot() {
-            boolean gammaEnabled = SelasClientConfig.RESPECT_GAMMA.getAsBoolean();
-            float gammaValue = gammaEnabled
-                    ? Minecraft.getInstance().options.gamma().get().floatValue()
-                    : 0.0F;
-
             return new FrameSettings(
                     (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble(),
                     (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble(),
@@ -223,9 +198,7 @@ public final class SelasLightmap {
                     (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble(),
                     (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble(),
                     (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble(),
-                    (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble(),
-                    gammaEnabled,
-                    gammaValue
+                    (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble()
             );
         }
 
@@ -252,9 +225,7 @@ public final class SelasLightmap {
                     nightCoolTint,
                     minimumFloor,
                     caveFloor,
-                    starlightFloor,
-                    gammaEnabled,
-                    gammaValue
+                    starlightFloor
             );
         }
     }
@@ -273,9 +244,7 @@ public final class SelasLightmap {
             float nightCoolTint,
             float minimumFloor,
             float caveFloor,
-            float starlightFloor,
-            boolean gammaEnabled,
-            float gammaValue
+            float starlightFloor
     ) {
         private static LightingContext create(ClientLevel level, float partialTick) {
             FrameSettings settings = FrameSettings.snapshot();

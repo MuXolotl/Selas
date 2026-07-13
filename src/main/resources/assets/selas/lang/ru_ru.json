@@ -11,7 +11,6 @@
   "selas.configuration.smooth_lightmap_updates": "Обновлять карту света каждый кадр",
   "selas.configuration.respect_night_vision": "Отключать при ночном зрении",
   "selas.configuration.respect_lightning_flashes": "Отключать при вспышках молний",
-  "selas.configuration.respect_gamma": "Разрешить ползунку яркости осветлять",
   "selas.configuration.disable_with_shaders": "Отключать при активном шейдер-паке",
   "selas.configuration.section.dimension_lighting": "Незер и Энд",
   "selas.configuration.nether_light_factor": "Фоновая яркость Незера",

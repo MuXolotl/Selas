@@ -11,7 +11,6 @@
   "selas.configuration.smooth_lightmap_updates": "Update lightmap every frame",
   "selas.configuration.respect_night_vision": "Disable during Night Vision",
   "selas.configuration.respect_lightning_flashes": "Disable during lightning flashes",
-  "selas.configuration.respect_gamma": "Let brightness slider brighten",
   "selas.configuration.disable_with_shaders": "Disable while shader pack is active",
   "selas.configuration.section.dimension_lighting": "Nether and End",
   "selas.configuration.nether_light_factor": "Nether ambient brightness",

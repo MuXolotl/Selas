@@ -23,6 +23,7 @@ Each release is split into two parts:
   - night now reads as a cooler blue-gray rather than just losing its reds.
 - Night colors now fade toward gray only deep in the night, so dusk and dawn keep more of their color.
 - Nights hold their full darkness slightly longer before dawn begins.
+- Removed the brightness-slider (gamma) option. It was off by default and worked inconsistently; Selas now always keeps its own darkness targets.
 
 ### Performance
 

@@ -9,7 +9,6 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.BooleanValue SMOOTH_LIGHTMAP_UPDATES;
     public static final ModConfigSpec.BooleanValue RESPECT_NIGHT_VISION;
     public static final ModConfigSpec.BooleanValue RESPECT_LIGHTNING_FLASHES;
-    public static final ModConfigSpec.BooleanValue RESPECT_GAMMA;
     public static final ModConfigSpec.BooleanValue DISABLE_WITH_SHADERS;
 
     public static final ModConfigSpec.BooleanValue AFFECT_OVERWORLD;
@@ -75,15 +74,6 @@ public final class SelasClientConfig {
                 .comment("Stops Selas from darkening lightning flashes.")
                 .translation("selas.configuration.respect_lightning_flashes")
                 .define("respect_lightning_flashes", true);
-
-        RESPECT_GAMMA = BUILDER
-                .comment(
-                        "When true, the brightness slider lifts Selas target brightness (no double-gamma on already-baked lightmap pixels). ",
-                        "When false, Selas keeps its absolute luminance targets so the slider cannot wash out nights and caves. ",
-                        "A small residual slider effect can still appear in already-bright areas because vanilla applies gamma before Selas runs."
-                )
-                .translation("selas.configuration.respect_gamma")
-                .define("respect_gamma", false);
 
         DISABLE_WITH_SHADERS = BUILDER
                 .comment(
