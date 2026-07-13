@@ -24,6 +24,10 @@ Each release is split into two parts:
 - Night colors now fade toward gray only deep in the night, so dusk and dawn keep more of their color.
 - Nights hold their full darkness slightly longer before dawn begins.
 
+### Performance
+
+- Reduced per-frame overhead by reading configuration values once per frame instead of once per lightmap pixel.
+
 ## 0.1.2
 
 ### Added
