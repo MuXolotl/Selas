@@ -41,6 +41,7 @@ public final class SelasClientConfig {
 
     public static final ModConfigSpec.DoubleValue NIGHT_DESATURATION;
     public static final ModConfigSpec.DoubleValue NIGHT_COOL_TINT;
+    public static final ModConfigSpec.DoubleValue MOON_WARMTH;
 
     public static final ModConfigSpec SPEC;
 
@@ -166,7 +167,7 @@ public final class SelasClientConfig {
         FULL_NIGHT_END_TICK = BUILDER
                 .comment("Full Selas night starts fading into dawn.")
                 .translation("selas.configuration.full_night_end_tick")
-                .defineInRange("full_night_end_tick", 21200, 0, 23999);
+                .defineInRange("full_night_end_tick", 21600, 0, 23999);
 
         DAWN_TRANSITION_END_TICK = BUILDER
                 .comment("Dawn fade ends after midnight wraps back to day tick 0.")
@@ -183,12 +184,12 @@ public final class SelasClientConfig {
         MOONLESS_NIGHT_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a new moon. Lower values make moonless nights darker. Keep above cave darkness for open sky.")
                 .translation("selas.configuration.moonless_night_sky_factor")
-                .defineInRange("moonless_night_sky_factor", 0.09D, 0.0D, 1.0D);
+                .defineInRange("moonless_night_sky_factor", 0.075D, 0.0D, 1.0D);
 
         FULL_MOON_SKY_FACTOR = BUILDER
                 .comment("Sky brightness at midnight during a full moon. Higher values make full-moon nights brighter.")
                 .translation("selas.configuration.full_moon_sky_factor")
-                .defineInRange("full_moon_sky_factor", 0.32D, 0.0D, 1.0D);
+                .defineInRange("full_moon_sky_factor", 0.34D, 0.0D, 1.0D);
 
         MOON_PHASE_CURVE = BUILDER
                 .comment("Controls the progression between new moon and full moon. 1 is linear; lower values brighten intermediate phases.")
@@ -220,7 +221,7 @@ public final class SelasClientConfig {
         CAVE_LUMINANCE_FLOOR = BUILDER
                 .comment("Near-black anti-crush floor when both block light and sky light are low (deep caves / sealed spaces). Should stay below open-sky starlight.")
                 .translation("selas.configuration.cave_luminance_floor")
-                .defineInRange("cave_luminance_floor", 0.005D, 0.0D, 0.25D);
+                .defineInRange("cave_luminance_floor", 0.004D, 0.0D, 0.25D);
 
         STARLIGHT_LUMINANCE_FLOOR = BUILDER
                 .comment(
@@ -228,12 +229,12 @@ public final class SelasClientConfig {
                         "Uses sky light presence so caves stay darker than moonless surface nights. 0 disables the extra floor."
                 )
                 .translation("selas.configuration.starlight_luminance_floor")
-                .defineInRange("starlight_luminance_floor", 0.012D, 0.0D, 0.25D);
+                .defineInRange("starlight_luminance_floor", 0.016D, 0.0D, 0.25D);
 
         DARKNESS_CURVE = BUILDER
                 .comment("Controls how quickly low light falls into darkness. Higher values make low light darker.")
                 .translation("selas.configuration.darkness_curve")
-                .defineInRange("darkness_curve", 1.65D, 0.25D, 4.0D);
+                .defineInRange("darkness_curve", 1.75D, 0.25D, 4.0D);
 
         BLOCK_LIGHT_PRESERVATION = BUILDER
                 .comment("Controls how much block light resists darkening. Higher values keep torches and lava brighter.")
@@ -250,12 +251,20 @@ public final class SelasClientConfig {
         NIGHT_DESATURATION = BUILDER
                 .comment("Removes color in darker areas. 0 disables this.")
                 .translation("selas.configuration.night_desaturation")
-                .defineInRange("night_desaturation", 0.30D, 0.0D, 1.0D);
+                .defineInRange("night_desaturation", 0.38D, 0.0D, 1.0D);
 
         NIGHT_COOL_TINT = BUILDER
                 .comment("Adds a small blue/cold tint in low natural light. 0 disables this.")
                 .translation("selas.configuration.night_cool_tint")
-                .defineInRange("night_cool_tint", 0.05D, 0.0D, 0.5D);
+                .defineInRange("night_cool_tint", 0.07D, 0.0D, 0.5D);
+
+        MOON_WARMTH = BUILDER
+                .comment(
+                        "Adds a faint warm (creamy) tint in low light that scales with moon brightness, ",
+                        "so full-moon nights feel slightly warmer than the plain cool starlight tint. 0 disables this."
+                )
+                .translation("selas.configuration.moon_warmth")
+                .defineInRange("moon_warmth", 0.03D, 0.0D, 0.3D);
 
         BUILDER.pop();
         BUILDER.pop();

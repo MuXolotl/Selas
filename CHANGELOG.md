@@ -9,6 +9,21 @@ Each release is split into two parts:
 
 ---
 
+## 0.1.3
+
+### Added
+
+- Full-moon nights now carry a faint, warm glow, so a full moon feels a little warmer than the plain cool starlight of a new moon. Adjustable, and can be turned off.
+
+### Changed
+
+- Rebalanced the default night look for stronger realism:
+  - moonless nights are a touch darker while full-moon nights are brighter,
+  - open skies keep a clearer starlight glow, and caves sit a little deeper in the dark,
+  - night now reads as a cooler blue-gray rather than just losing its reds.
+- Night colors now fade toward gray only deep in the night, so dusk and dawn keep more of their color.
+- Nights hold their full darkness slightly longer before dawn begins.
+
 ## 0.1.2
 
 ### Added

@@ -37,5 +37,6 @@
   "selas.configuration.darkness_curve": "Кривая темноты",
   "selas.configuration.block_light_preservation": "Сохранение блочного света",
   "selas.configuration.night_desaturation": "Десатурация при слабом свете",
-  "selas.configuration.night_cool_tint": "Холодный оттенок при слабом свете"
+  "selas.configuration.night_cool_tint": "Холодный оттенок при слабом свете",
+  "selas.configuration.moon_warmth": "Тёплый оттенок полнолуния"
 }

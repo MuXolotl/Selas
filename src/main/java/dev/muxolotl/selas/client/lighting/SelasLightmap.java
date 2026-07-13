@@ -120,7 +120,8 @@ public final class SelasLightmap {
         }
 
         float darkness = 1.0F - saturate(effectiveLight);
-        float desaturation = darkness * (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble();
+        float desaturation = (float) Math.pow(darkness, 1.5F)
+                * (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble();
         if (desaturation > 0.0F) {
             float gray = luminance(r, g, b);
             r = Mth.lerp(desaturation, r, gray);
@@ -130,9 +131,16 @@ public final class SelasLightmap {
 
         float coolTint = darkness * context.nightAmount() * (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble();
         if (coolTint > 0.0F) {
-            r *= 1.0F - coolTint * 0.55F;
-            g *= 1.0F - coolTint * 0.18F;
-            b = b * (1.0F - coolTint * 0.08F) + coolTint * 0.018F;
+            r *= 1.0F - coolTint * 0.45F;
+            g *= 1.0F - coolTint * 0.12F;
+            b = b * (1.0F - coolTint * 0.04F) + coolTint * 0.030F;
+        }
+
+        float moonWarm = darkness * context.moonWarmth();
+        if (moonWarm > 0.0F) {
+            r *= 1.0F + moonWarm * 0.06F;
+            g *= 1.0F + moonWarm * 0.02F;
+            b *= 1.0F - moonWarm * 0.04F;
         }
 
         float warmTint = darkness * context.warmTint();
@@ -197,7 +205,8 @@ public final class SelasLightmap {
             boolean skyless,
             float baseAmbient,
             float warmTint,
-            float coolTint
+            float coolTint,
+            float moonWarmth
     ) {
         private static LightingContext create(ClientLevel level, float partialTick) {
             if (!level.dimensionType().hasSkyLight()) {
@@ -210,6 +219,7 @@ public final class SelasLightmap {
                             true,
                             nether,
                             (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(),
+                            0.0F,
                             0.0F
                     );
                 }
@@ -221,11 +231,12 @@ public final class SelasLightmap {
                             true,
                             end,
                             0.0F,
-                            (float) SelasClientConfig.END_COOL_TINT.getAsDouble()
+                            (float) SelasClientConfig.END_COOL_TINT.getAsDouble(),
+                            0.0F
                     );
                 }
                 float factor = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
-                return new LightingContext(0.0F, 1.0F, true, factor, 0.0F, 0.0F);
+                return new LightingContext(0.0F, 1.0F, true, factor, 0.0F, 0.0F, 0.0F);
             }
 
             float dayTick = positiveModulo((level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
@@ -247,7 +258,11 @@ public final class SelasLightmap {
 
             float naturalSkyFactor = Mth.lerp(night, 1.0F, lunarFactor);
             float skyFactor = naturalSkyFactor * weather;
-            return new LightingContext(saturate(skyFactor), night, false, 0.0F, 0.0F, 0.0F);
+
+            float moonWarmth = moonPhaseProgress * night * weather
+                    * (float) SelasClientConfig.MOON_WARMTH.getAsDouble();
+
+            return new LightingContext(saturate(skyFactor), night, false, 0.0F, 0.0F, 0.0F, moonWarmth);
         }
 
         private float floor(float block, float sky) {

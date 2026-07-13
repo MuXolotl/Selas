@@ -37,5 +37,6 @@
   "selas.configuration.darkness_curve": "Darkness curve",
   "selas.configuration.block_light_preservation": "Block light preservation",
   "selas.configuration.night_desaturation": "Low-light desaturation",
-  "selas.configuration.night_cool_tint": "Low-light cool tint"
+  "selas.configuration.night_cool_tint": "Low-light cool tint",
+  "selas.configuration.moon_warmth": "Full-moon warmth"
 }
