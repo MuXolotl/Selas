@@ -9,6 +9,13 @@ Each release is split into two parts:
 
 ---
 
+## 0.2.0
+
+### Added
+
+- Distant fog now blends into the sky color, so the horizon melts into the sky instead of looking like a separate band, adding a real sense of atmospheric depth (sunsets, blue daytime haze, and so on).
+- Atmospheric fog reacts to the time of day and weather: nights pull the fog toward a darker blue-gray, and rain and thunder desaturate it toward a muted gray. Works in the Overworld and can be tuned or turned off in the new Atmosphere config section.
+
 ## 0.1.3
 
 ### Added

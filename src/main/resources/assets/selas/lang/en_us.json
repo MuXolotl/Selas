@@ -45,5 +45,10 @@
   "selas.configuration.atmosphere_disable_with_shaders": "Disable while shader pack is active",
   "selas.configuration.atmosphere_affect_overworld": "Affect Overworld",
   "selas.configuration.atmosphere_affect_nether": "Affect Nether",
-  "selas.configuration.atmosphere_affect_end": "Affect End"
+  "selas.configuration.atmosphere_affect_end": "Affect End",
+  "selas.configuration.section.atmosphere_fog_color": "Fog color",
+  "selas.configuration.fog_sky_blend": "Fog-to-sky blending",
+  "selas.configuration.night_fog_strength": "Night fog darkening",
+  "selas.configuration.weather_fog_desaturation": "Weather fog desaturation",
+  "selas.configuration.fog_color_smoothing": "Fog color smoothing"
 }

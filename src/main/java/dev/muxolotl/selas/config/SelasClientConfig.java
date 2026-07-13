@@ -48,6 +48,11 @@ public final class SelasClientConfig {
     public static final ModConfigSpec.BooleanValue ATMOSPHERE_AFFECT_NETHER;
     public static final ModConfigSpec.BooleanValue ATMOSPHERE_AFFECT_END;
 
+    public static final ModConfigSpec.DoubleValue NIGHT_FOG_STRENGTH;
+    public static final ModConfigSpec.DoubleValue WEATHER_FOG_DESATURATION;
+    public static final ModConfigSpec.DoubleValue FOG_SKY_BLEND;
+    public static final ModConfigSpec.DoubleValue FOG_COLOR_SMOOTHING;
+
     public static final ModConfigSpec SPEC;
 
     static {
@@ -306,6 +311,33 @@ public final class SelasClientConfig {
                 .comment("Applies fog changes in the End.")
                 .translation("selas.configuration.atmosphere_affect_end")
                 .define("atmosphere_affect_end", true);
+
+        BUILDER.pop();
+
+        BUILDER
+                .comment("Fog color response to time of day and weather.")
+                .translation("selas.configuration.section.atmosphere_fog_color")
+                .push("fog_color");
+
+        FOG_SKY_BLEND = BUILDER
+                .comment("How much the distant fog blends toward the current sky color, so the horizon melts into the sky instead of looking like a separate band. 0 disables sky blending.")
+                .translation("selas.configuration.fog_sky_blend")
+                .defineInRange("fog_sky_blend", 0.55D, 0.0D, 1.0D);
+
+        NIGHT_FOG_STRENGTH = BUILDER
+                .comment("How much the fog darkens and cools toward blue-gray at night. 0 disables the night response.")
+                .translation("selas.configuration.night_fog_strength")
+                .defineInRange("night_fog_strength", 0.45D, 0.0D, 1.0D);
+
+        WEATHER_FOG_DESATURATION = BUILDER
+                .comment("How much rain and thunder push the fog toward a desaturated blue-gray. Rain and thunder do not stack. 0 disables the weather response.")
+                .translation("selas.configuration.weather_fog_desaturation")
+                .defineInRange("weather_fog_desaturation", 0.40D, 0.0D, 1.0D);
+
+        FOG_COLOR_SMOOTHING = BUILDER
+                .comment("How quickly the fog color follows changes in time and weather. Lower is smoother (slower). 1 disables smoothing.")
+                .translation("selas.configuration.fog_color_smoothing")
+                .defineInRange("fog_color_smoothing", 0.10D, 0.01D, 1.0D);
 
         BUILDER.pop();
         BUILDER.pop();

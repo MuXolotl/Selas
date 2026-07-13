@@ -8,7 +8,7 @@ Selas is a client-side NeoForge mod for Minecraft 1.21.1.
 
 It reworks Minecraft's vanilla lightmap to make nights, caves, rain, and thunder darker in a more natural and readable way. The goal is not pure black darkness, but lighting that feels more grounded: sealed unlit spaces should approach black, while open nights should still keep moonlight, starlight, and a little atmospheric glow.
 
-Selas does **not** add blocks, items, mobs, dimensions, fog systems, or dynamic lights. It is a visual lighting mod focused on the vanilla lightmap.
+Selas does **not** add blocks, items, mobs, dimensions, or dynamic lights. It is a visual lighting mod focused on the vanilla lightmap, with light atmospheric fog tuning layered on top.
 
 ## Downloads
 
@@ -32,6 +32,7 @@ Selas does **not** add blocks, items, mobs, dimensions, fog systems, or dynamic 
 - low-light cool tint
 - full-moon warmth
 - Nether and End lighting (warm Nether ambient, cool End ambient)
+- atmospheric fog color (blends into the sky, night darkening, weather desaturation)
 - optional auto-disable while a shader pack is active
 
 ## What it does not change
@@ -41,7 +42,7 @@ Selas does **not** add blocks, items, mobs, dimensions, fog systems, or dynamic 
 - server time
 - block light propagation
 - sky rendering
-- fog rendering
+- fog geometry or render distance (only fog color, for now)
 - dynamic lights
 - blocks, items, mobs, or dimensions
 
@@ -80,6 +81,9 @@ natural_darkness.twilight
 natural_darkness.natural_light
 natural_darkness.darkness
 natural_darkness.color
+atmosphere.general
+atmosphere.dimensions
+atmosphere.fog_color
 ```
 
 ### Section overview
@@ -104,6 +108,15 @@ natural_darkness.color
 
 - `natural_darkness.color`  
   Low-light desaturation, cool tint, and full-moon warmth behavior.
+
+- `atmosphere.general`  
+  Main switches for the atmospheric fog module, including enable/disable and shader-pack auto-disable.
+
+- `atmosphere.dimensions`  
+  Controls where fog changes are active: Overworld, Nether, and End.
+
+- `atmosphere.fog_color`  
+  Fog color response: blending the horizon into the sky color, night darkening, weather desaturation, and color smoothing.
 
 Selas does **not** use presets or profiles. Values are changed directly in the config.
 

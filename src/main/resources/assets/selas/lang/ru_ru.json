@@ -45,5 +45,10 @@
   "selas.configuration.atmosphere_disable_with_shaders": "Отключать при активном шейдер-паке",
   "selas.configuration.atmosphere_affect_overworld": "Влиять на Верхний мир",
   "selas.configuration.atmosphere_affect_nether": "Влиять на Незер",
-  "selas.configuration.atmosphere_affect_end": "Влиять на Энд"
+  "selas.configuration.atmosphere_affect_end": "Влиять на Энд",
+  "selas.configuration.section.atmosphere_fog_color": "Цвет тумана",
+  "selas.configuration.fog_sky_blend": "Смешивание тумана с небом",
+  "selas.configuration.night_fog_strength": "Затемнение тумана ночью",
+  "selas.configuration.weather_fog_desaturation": "Десатурация тумана от погоды",
+  "selas.configuration.fog_color_smoothing": "Сглаживание цвета тумана"
 }
