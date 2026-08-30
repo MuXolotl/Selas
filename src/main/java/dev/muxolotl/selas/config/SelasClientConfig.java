@@ -106,7 +106,7 @@ public final class SelasClientConfig {
                 .define("affect_skyless_dimensions", true);
 
         SKYLESS_DIMENSION_LIGHT_FACTOR = BUILDER
-                .comment("Base ambient brightness for modded dimensions with no sun/moon that are neither the Nether nor the End.")
+                .comment("Ambient glow for modded dimensions with no sun/moon that are neither the Nether nor the End. 0 leaves them dark; higher values lift dark areas.")
                 .translation("selas.configuration.skyless_dimension_light_factor")
                 .defineInRange("skyless_dimension_light_factor", 0.10D, 0.0D, 1.0D);
 
@@ -118,7 +118,7 @@ public final class SelasClientConfig {
                 .push("dimension_lighting");
 
         NETHER_LIGHT_FACTOR = BUILDER
-                .comment("Base ambient brightness added across the Nether. Higher values make the Nether more playable but less moody.")
+                .comment("Ambient glow added across the Nether. 0 leaves the Nether dark; higher values lift dark areas toward a warm glow, making it more playable but less moody.")
                 .translation("selas.configuration.nether_light_factor")
                 .defineInRange("nether_light_factor", 0.14D, 0.0D, 1.0D);
 
@@ -128,7 +128,7 @@ public final class SelasClientConfig {
                 .defineInRange("nether_warm_tint", 0.06D, 0.0D, 0.5D);
 
         END_LIGHT_FACTOR = BUILDER
-                .comment("Base ambient brightness added across the End. Higher values make the void more visible.")
+                .comment("Ambient glow added across the End. 0 leaves the End dark; higher values lift dark areas toward a cool glow, making the void more visible.")
                 .translation("selas.configuration.end_light_factor")
                 .defineInRange("end_light_factor", 0.09D, 0.0D, 1.0D);
 
