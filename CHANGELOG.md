@@ -11,6 +11,16 @@ Each release is split into two parts:
 
 ## 0.1.4
 
+### Added
+
+- One-click **look presets**. A new "Look preset" setting lets you pick a mood in a single click instead of tuning every slider:
+  - **Vanilla+** — closest to vanilla, just a touch moodier and easiest to see by.
+  - **Balanced** — the tuned default look (identical to the shipped defaults).
+  - **Realistic** — darker, cooler, and stormier; nights and caves want a light source.
+  - **Horror** — near-black sealed spaces and heavy, desaturated gloom.
+  - **Custom** — keep using your own individual slider values.
+  A preset only overrides the "look" values (moon, weather, brightness, color, and Nether/End/skyless ambient); it never changes day/night timing or the compatibility toggles, and switching back to Custom restores your own values untouched.
+
 ### Fixed
 
 - Nether, End, and modded skyless ambient brightness now actually **add** light. Previously these sliders could only stop dark areas from being darkened, so raising them past a point did nothing; now higher values lift dark areas toward a real glow, matching what the settings describe. Pitch-black corners of the Nether and End gently brighten instead of staying crushed.
@@ -22,7 +32,8 @@ Each release is split into two parts:
 <details><summary>Technical / internal</summary>
 
 - Extracted all engine-independent lighting math into a new `SelasMath` class (night curve, wrapped-range twilight timing, moon-phase response, weather, brightness floors, and lightmap color packing).
-- Added a JUnit test suite covering `SelasMath`, so the tuned lighting behavior is locked down against regressions. Wired JUnit 5 into the Gradle build.
+- Added an engine-independent `SelasPreset` enum holding the frozen preset look values. The lightmap pipeline resolves an effective "look" once per frame from the active preset (or the sliders in Custom mode), keeping the rest of the code preset-agnostic.
+- Added a JUnit test suite covering `SelasMath` and `SelasPreset`, so the tuned lighting behavior is locked down against regressions (curve/timing/color math, plus preset config-range bounds, darkening-ladder ordering, and the caves-darker-than-open-sky invariant). Wired JUnit 5 into the Gradle build.
 - Merged the two per-frame lighting records into a single `LightingContext` with named factory paths, removing the long positional argument list.
 - Named the previously magic per-channel tint coefficients as constants.
 - Skyless ambient is now applied as an additive screen blend after the darkening pass instead of being folded into the luminance ceiling.

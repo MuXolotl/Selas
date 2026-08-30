@@ -198,13 +198,15 @@ public final class SelasLightmap {
             float starlightFloor
     ) {
         private static LightingContext create(ClientLevel level, float partialTick) {
-            float blockLightPreservation = (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble();
-            float darknessCurve = (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble();
-            float nightDesaturation = (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble();
-            float nightCoolTint = (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble();
-            float minimumFloor = (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble();
-            float caveFloor = (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble();
-            float starlightFloor = (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble();
+            SelasPreset.Look look = resolveLook();
+
+            float blockLightPreservation = look.blockLightPreservation();
+            float darknessCurve = look.darknessCurve();
+            float nightDesaturation = look.nightDesaturation();
+            float nightCoolTint = look.nightCoolTint();
+            float minimumFloor = look.minimumLuminanceFloor();
+            float caveFloor = look.caveLuminanceFloor();
+            float starlightFloor = look.starlightLuminanceFloor();
 
             if (!level.dimensionType().hasSkyLight()) {
                 ResourceKey<Level> dimension = level.dimension();
@@ -212,13 +214,13 @@ public final class SelasLightmap {
                 float warmTint = 0.0F;
                 float coolTint = 0.0F;
                 if (dimension.equals(Level.NETHER)) {
-                    baseAmbient = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
-                    warmTint = (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble();
+                    baseAmbient = look.netherLightFactor();
+                    warmTint = look.netherWarmTint();
                 } else if (dimension.equals(Level.END)) {
-                    baseAmbient = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
-                    coolTint = (float) SelasClientConfig.END_COOL_TINT.getAsDouble();
+                    baseAmbient = look.endLightFactor();
+                    coolTint = look.endCoolTint();
                 } else {
-                    baseAmbient = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
+                    baseAmbient = look.skylessDimensionLightFactor();
                 }
                 return new LightingContext(
                         0.0F, 0.0F, true, baseAmbient, warmTint, coolTint, 0.0F,
@@ -230,28 +232,58 @@ public final class SelasLightmap {
                     (level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
             float night = calculateNightAmount(dayTick);
             float moon = SelasMath.saturate(level.getMoonBrightness());
-            float moonless = (float) SelasClientConfig.MOONLESS_NIGHT_SKY_FACTOR.getAsDouble();
-            float fullMoon = (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble();
-            float moonCurve = (float) SelasClientConfig.MOON_PHASE_CURVE.getAsDouble();
+            float moonless = look.moonlessNightSkyFactor();
+            float fullMoon = look.fullMoonSkyFactor();
+            float moonCurve = look.moonPhaseCurve();
             float moonPhaseProgress = SelasMath.moonPhaseProgress(moon, moonCurve);
             float lunarFactor = Mth.lerp(moonPhaseProgress, moonless, fullMoon);
 
             float weather = SelasMath.weatherFactor(
                     level.getRainLevel(partialTick),
                     level.getThunderLevel(partialTick),
-                    (float) SelasClientConfig.RAIN_DARKENING.getAsDouble(),
-                    (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble());
+                    look.rainDarkening(),
+                    look.thunderDarkening());
 
             float naturalSkyFactor = Mth.lerp(night, 1.0F, lunarFactor);
             float skyFactor = SelasMath.saturate(naturalSkyFactor * weather);
 
-            float moonWarmth = moonPhaseProgress * night * weather
-                    * (float) SelasClientConfig.MOON_WARMTH.getAsDouble();
+            float moonWarmth = moonPhaseProgress * night * weather * look.moonWarmth();
 
             return new LightingContext(
                     skyFactor, night, false, 0.0F, 0.0F, 0.0F, moonWarmth,
                     blockLightPreservation, darknessCurve, nightDesaturation, nightCoolTint,
                     minimumFloor, caveFloor, starlightFloor);
+        }
+
+        /**
+         * Effective "look" values for this frame: a non-custom preset overrides
+         * the individual sliders, while CUSTOM builds a Look from them so the rest
+         * of the pipeline is preset-agnostic.
+         */
+        private static SelasPreset.Look resolveLook() {
+            SelasPreset preset = SelasClientConfig.PRESET.get();
+            if (preset != null && !preset.isCustom()) {
+                return preset.look();
+            }
+            return new SelasPreset.Look(
+                    (float) SelasClientConfig.MOONLESS_NIGHT_SKY_FACTOR.getAsDouble(),
+                    (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble(),
+                    (float) SelasClientConfig.MOON_PHASE_CURVE.getAsDouble(),
+                    (float) SelasClientConfig.RAIN_DARKENING.getAsDouble(),
+                    (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble(),
+                    (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble(),
+                    (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble(),
+                    (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble(),
+                    (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble(),
+                    (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble(),
+                    (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble(),
+                    (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble(),
+                    (float) SelasClientConfig.MOON_WARMTH.getAsDouble(),
+                    (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble(),
+                    (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(),
+                    (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble(),
+                    (float) SelasClientConfig.END_COOL_TINT.getAsDouble(),
+                    (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble());
         }
 
         private float floor(float block, float sky) {

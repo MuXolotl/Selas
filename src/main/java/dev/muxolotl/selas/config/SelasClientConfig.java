@@ -1,11 +1,13 @@
 package dev.muxolotl.selas.config;
 
+import dev.muxolotl.selas.client.lighting.SelasPreset;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class SelasClientConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     public static final ModConfigSpec.BooleanValue ENABLED;
+    public static final ModConfigSpec.EnumValue<SelasPreset> PRESET;
     public static final ModConfigSpec.BooleanValue SMOOTH_LIGHTMAP_UPDATES;
     public static final ModConfigSpec.BooleanValue RESPECT_NIGHT_VISION;
     public static final ModConfigSpec.BooleanValue RESPECT_LIGHTNING_FLASHES;
@@ -59,6 +61,17 @@ public final class SelasClientConfig {
                 .comment("Turns the Selas lightmap changes on or off.")
                 .translation("selas.configuration.enabled")
                 .define("enabled", true);
+
+        PRESET = BUILDER
+                .comment(
+                        "One-click look preset. Anything other than CUSTOM overrides the individual 'look' sliders ",
+                        "(moon, weather, brightness floors, darkness curve, color, and Nether/End/skyless ambient). ",
+                        "It does NOT change day/night timing or the compatibility toggles. ",
+                        "Set to CUSTOM to use your own slider values. BALANCED equals the shipped defaults. ",
+                        "VANILLA_PLUS = closest to vanilla, REALISTIC = darker and cooler, HORROR = near-black and oppressive."
+                )
+                .translation("selas.configuration.preset")
+                .defineEnum("preset", SelasPreset.CUSTOM);
 
         SMOOTH_LIGHTMAP_UPDATES = BUILDER
                 .comment("Updates the lightmap every rendered frame while Selas is active. This makes day/night transitions smoother.")
