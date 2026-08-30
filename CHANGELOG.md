@@ -9,6 +9,28 @@ Each release is split into two parts:
 
 ---
 
+## 0.1.4
+
+### Fixed
+
+- Nether, End, and modded skyless ambient brightness now actually **add** light. Previously these sliders could only stop dark areas from being darkened, so raising them past a point did nothing; now higher values lift dark areas toward a real glow, matching what the settings describe. Pitch-black corners of the Nether and End gently brighten instead of staying crushed.
+
+### Changed
+
+- Reworded the Nether/End/skyless brightness settings so they clearly describe added glow (0 = dark, higher = brighter).
+
+<details><summary>Technical / internal</summary>
+
+- Extracted all engine-independent lighting math into a new `SelasMath` class (night curve, wrapped-range twilight timing, moon-phase response, weather, brightness floors, and lightmap color packing).
+- Added a JUnit test suite covering `SelasMath`, so the tuned lighting behavior is locked down against regressions. Wired JUnit 5 into the Gradle build.
+- Merged the two per-frame lighting records into a single `LightingContext` with named factory paths, removing the long positional argument list.
+- Named the previously magic per-channel tint coefficients as constants.
+- Skyless ambient is now applied as an additive screen blend after the darkening pass instead of being folded into the luminance ceiling.
+- The lightmap post-processing mixin injection is now optional (`require = 0`), so an unexpected target mapping degrades gracefully instead of crashing startup.
+- Removed a dead Mod Menu (Fabric) description translation key from the language files.
+
+</details>
+
 ## 0.1.3
 
 ### Added

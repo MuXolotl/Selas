@@ -24,7 +24,7 @@ public abstract class LightTextureMixin {
         }
     }
 
-    @Inject(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"))
+    @Inject(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"), require = 0, expect = 0)
     private void selas$applyNaturalDarkness(float partialTick, CallbackInfo ci) {
         float selasPartialTick = SelasLightmap.shouldUpdateEveryFrame() ? partialTick : 0.0F;
         SelasLightmap.transform(this.lightPixels, selasPartialTick);

@@ -13,15 +13,30 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 
 public final class SelasLightmap {
-    private static final float LUMINANCE_R = 0.2126F;
-    private static final float LUMINANCE_G = 0.7152F;
-    private static final float LUMINANCE_B = 0.0722F;
-    private static final float MINECRAFT_DAY_TICKS = 24000.0F;
+    private static final float MINECRAFT_DAY_TICKS = SelasMath.MINECRAFT_DAY_TICKS;
 
     private static final int DEFAULT_DUSK_TRANSITION_START_TICK = 11800;
     private static final int DEFAULT_FULL_NIGHT_START_TICK = 14000;
     private static final int DEFAULT_FULL_NIGHT_END_TICK = 21200;
     private static final int DEFAULT_DAWN_TRANSITION_END_TICK = 400;
+
+    // Per-channel tint response coefficients. Kept as named constants so the mood
+    // of each tint is legible instead of hidden behind bare magic numbers.
+    private static final float COOL_TINT_R = 0.45F;
+    private static final float COOL_TINT_G = 0.12F;
+    private static final float COOL_TINT_B_MUL = 0.04F;
+    private static final float COOL_TINT_B_ADD = 0.030F;
+
+    private static final float MOON_WARM_R = 0.06F;
+    private static final float MOON_WARM_G = 0.02F;
+    private static final float MOON_WARM_B = 0.04F;
+
+    private static final float NETHER_TINT_R = 0.15F;
+    private static final float NETHER_TINT_G = 0.30F;
+    private static final float NETHER_TINT_B = 0.50F;
+
+    private static final float END_TINT_R = 0.50F;
+    private static final float END_TINT_G = 0.25F;
 
     private static String lastInvalidTwilightValues;
 
@@ -96,21 +111,18 @@ public final class SelasLightmap {
         float block = blockIndex / 15.0F;
         float sky = skyIndex / 15.0F;
 
-        float blockContribution = saturate(block * context.blockLightPreservation());
-        float skyContribution = saturate(sky * context.skyFactor());
-        float effectiveLight = combineLightContributions(blockContribution, skyContribution);
+        float effectiveLight = SelasMath.effectiveLight(
+                block, sky, context.blockLightPreservation(), context.skyFactor());
 
         float floor = context.floor(block, sky);
-        float curve = context.darknessCurve();
-        float targetLuminance = floor + (1.0F - floor) * (float) Math.pow(saturate(effectiveLight), curve);
-        targetLuminance = saturate(targetLuminance + context.baseAmbient());
+        float targetLuminance = SelasMath.targetLuminance(effectiveLight, floor, context.darknessCurve(), 0.0F);
 
         float r = (color & 0xFF) / 255.0F;
         float g = ((color >>> 8) & 0xFF) / 255.0F;
         float b = ((color >>> 16) & 0xFF) / 255.0F;
         float a = ((color >>> 24) & 0xFF) / 255.0F;
 
-        float currentLuminance = luminance(r, g, b);
+        float currentLuminance = SelasMath.luminance(r, g, b);
         if (currentLuminance > targetLuminance && currentLuminance > 0.0001F) {
             float scale = targetLuminance / currentLuminance;
             r *= scale;
@@ -118,116 +130,55 @@ public final class SelasLightmap {
             b *= scale;
         }
 
-        float darkness = 1.0F - saturate(effectiveLight);
-        float desaturation = (float) Math.pow(darkness, 1.5F)
-                * context.nightDesaturation();
+        float darkness = 1.0F - SelasMath.saturate(effectiveLight);
+
+        float desaturation = SelasMath.desaturationAmount(darkness, context.nightDesaturation());
         if (desaturation > 0.0F) {
-            float gray = luminance(r, g, b);
+            float gray = SelasMath.luminance(r, g, b);
             r = Mth.lerp(desaturation, r, gray);
             g = Mth.lerp(desaturation, g, gray);
             b = Mth.lerp(desaturation, b, gray);
         }
 
+        // Skyless dimensions get an additive ambient lift so pitch-black cells are
+        // raised toward a faint glow instead of merely being capped. A screen blend
+        // keeps already-lit cells untouched, so a higher ambient factor reads as
+        // genuinely brighter (not just "less darkened").
+        float ambient = context.baseAmbient();
+        if (ambient > 0.0F) {
+            r = r + (1.0F - r) * ambient;
+            g = g + (1.0F - g) * ambient;
+            b = b + (1.0F - b) * ambient;
+        }
+
         float coolTint = darkness * context.nightAmount() * context.nightCoolTint();
         if (coolTint > 0.0F) {
-            r *= 1.0F - coolTint * 0.45F;
-            g *= 1.0F - coolTint * 0.12F;
-            b = b * (1.0F - coolTint * 0.04F) + coolTint * 0.030F;
+            r *= 1.0F - coolTint * COOL_TINT_R;
+            g *= 1.0F - coolTint * COOL_TINT_G;
+            b = b * (1.0F - coolTint * COOL_TINT_B_MUL) + coolTint * COOL_TINT_B_ADD;
         }
 
         float moonWarm = darkness * context.moonWarmth();
         if (moonWarm > 0.0F) {
-            r *= 1.0F + moonWarm * 0.06F;
-            g *= 1.0F + moonWarm * 0.02F;
-            b *= 1.0F - moonWarm * 0.04F;
+            r *= 1.0F + moonWarm * MOON_WARM_R;
+            g *= 1.0F + moonWarm * MOON_WARM_G;
+            b *= 1.0F - moonWarm * MOON_WARM_B;
         }
 
         float warmTint = darkness * context.warmTint();
         if (warmTint > 0.0F) {
-            r *= 1.0F - 0.15F * warmTint;
-            g *= 1.0F - 0.30F * warmTint;
-            b *= 1.0F - 0.50F * warmTint;
+            r *= 1.0F - NETHER_TINT_R * warmTint;
+            g *= 1.0F - NETHER_TINT_G * warmTint;
+            b *= 1.0F - NETHER_TINT_B * warmTint;
         }
 
         float endCoolTint = darkness * context.coolTint();
         if (endCoolTint > 0.0F) {
-            r *= 1.0F - 0.50F * endCoolTint;
-            g *= 1.0F - 0.25F * endCoolTint;
+            r *= 1.0F - END_TINT_R * endCoolTint;
+            g *= 1.0F - END_TINT_G * endCoolTint;
         }
 
-        return toNativeImageColor(a, r, g, b);
-    }
-
-
-    private static float luminance(float r, float g, float b) {
-        return r * LUMINANCE_R + g * LUMINANCE_G + b * LUMINANCE_B;
-    }
-
-    private static int toNativeImageColor(float a, float r, float g, float b) {
-        int ai = Math.round(saturate(a) * 255.0F);
-        int ri = Math.round(saturate(r) * 255.0F);
-        int gi = Math.round(saturate(g) * 255.0F);
-        int bi = Math.round(saturate(b) * 255.0F);
-        // NativeImage lightmap pixels are RGBA in memory, packed little-endian as 0xAABBGGRR.
-        return (ai << 24) | ri | (gi << 8) | (bi << 16);
-    }
-
-    private static float saturate(float value) {
-        return Mth.clamp(value, 0.0F, 1.0F);
-    }
-
-    private static float combineLightContributions(float block, float sky) {
-        return saturate(block + sky - block * sky);
-    }
-
-
-    private record FrameSettings(
-            float blockLightPreservation,
-            float darknessCurve,
-            float nightDesaturation,
-            float nightCoolTint,
-            float minimumFloor,
-            float caveFloor,
-            float starlightFloor
-    ) {
-        private static FrameSettings snapshot() {
-            return new FrameSettings(
-                    (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble(),
-                    (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble(),
-                    (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble(),
-                    (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble(),
-                    (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble(),
-                    (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble(),
-                    (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble()
-            );
-        }
-
-        private LightingContext toContext(
-                float skyFactor,
-                float nightAmount,
-                boolean skyless,
-                float baseAmbient,
-                float warmTint,
-                float coolTint,
-                float moonWarmth
-        ) {
-            return new LightingContext(
-                    skyFactor,
-                    nightAmount,
-                    skyless,
-                    baseAmbient,
-                    warmTint,
-                    coolTint,
-                    moonWarmth,
-                    blockLightPreservation,
-                    darknessCurve,
-                    nightDesaturation,
-                    nightCoolTint,
-                    minimumFloor,
-                    caveFloor,
-                    starlightFloor
-            );
-        }
+        return SelasMath.packNativeColor(a, r, g, b);
     }
 
     private record LightingContext(
@@ -247,104 +198,78 @@ public final class SelasLightmap {
             float starlightFloor
     ) {
         private static LightingContext create(ClientLevel level, float partialTick) {
-            FrameSettings settings = FrameSettings.snapshot();
+            float blockLightPreservation = (float) SelasClientConfig.BLOCK_LIGHT_PRESERVATION.getAsDouble();
+            float darknessCurve = (float) SelasClientConfig.DARKNESS_CURVE.getAsDouble();
+            float nightDesaturation = (float) SelasClientConfig.NIGHT_DESATURATION.getAsDouble();
+            float nightCoolTint = (float) SelasClientConfig.NIGHT_COOL_TINT.getAsDouble();
+            float minimumFloor = (float) SelasClientConfig.MINIMUM_LUMINANCE_FLOOR.getAsDouble();
+            float caveFloor = (float) SelasClientConfig.CAVE_LUMINANCE_FLOOR.getAsDouble();
+            float starlightFloor = (float) SelasClientConfig.STARLIGHT_LUMINANCE_FLOOR.getAsDouble();
 
             if (!level.dimensionType().hasSkyLight()) {
                 ResourceKey<Level> dimension = level.dimension();
+                float baseAmbient;
+                float warmTint = 0.0F;
+                float coolTint = 0.0F;
                 if (dimension.equals(Level.NETHER)) {
-                    float nether = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
-                    return settings.toContext(
-                            0.0F,
-                            0.0F,
-                            true,
-                            nether,
-                            (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble(),
-                            0.0F,
-                            0.0F
-                    );
+                    baseAmbient = (float) SelasClientConfig.NETHER_LIGHT_FACTOR.getAsDouble();
+                    warmTint = (float) SelasClientConfig.NETHER_WARM_TINT.getAsDouble();
+                } else if (dimension.equals(Level.END)) {
+                    baseAmbient = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
+                    coolTint = (float) SelasClientConfig.END_COOL_TINT.getAsDouble();
+                } else {
+                    baseAmbient = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
                 }
-                if (dimension.equals(Level.END)) {
-                    float end = (float) SelasClientConfig.END_LIGHT_FACTOR.getAsDouble();
-                    return settings.toContext(
-                            0.0F,
-                            0.0F,
-                            true,
-                            end,
-                            0.0F,
-                            (float) SelasClientConfig.END_COOL_TINT.getAsDouble(),
-                            0.0F
-                    );
-                }
-                float factor = (float) SelasClientConfig.SKYLESS_DIMENSION_LIGHT_FACTOR.getAsDouble();
-                return settings.toContext(0.0F, 1.0F, true, factor, 0.0F, 0.0F, 0.0F);
+                return new LightingContext(
+                        0.0F, 0.0F, true, baseAmbient, warmTint, coolTint, 0.0F,
+                        blockLightPreservation, darknessCurve, nightDesaturation, nightCoolTint,
+                        minimumFloor, caveFloor, starlightFloor);
             }
 
-            float dayTick = positiveModulo((level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
+            float dayTick = SelasMath.positiveModulo(
+                    (level.getDayTime() % 24000L) + partialTick, MINECRAFT_DAY_TICKS);
             float night = calculateNightAmount(dayTick);
-            float moon = saturate(level.getMoonBrightness());
+            float moon = SelasMath.saturate(level.getMoonBrightness());
             float moonless = (float) SelasClientConfig.MOONLESS_NIGHT_SKY_FACTOR.getAsDouble();
             float fullMoon = (float) SelasClientConfig.FULL_MOON_SKY_FACTOR.getAsDouble();
             float moonCurve = (float) SelasClientConfig.MOON_PHASE_CURVE.getAsDouble();
-            float moonPhaseProgress = saturate((float) Math.pow(moon, moonCurve));
+            float moonPhaseProgress = SelasMath.moonPhaseProgress(moon, moonCurve);
             float lunarFactor = Mth.lerp(moonPhaseProgress, moonless, fullMoon);
 
-            float rain = saturate(level.getRainLevel(partialTick));
-            float thunder = saturate(level.getThunderLevel(partialTick));
-            float rainDarkening = rain * (float) SelasClientConfig.RAIN_DARKENING.getAsDouble();
-            float thunderDarkening = thunder * (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble();
-
-            float weather = 1.0F - Math.max(rainDarkening, thunderDarkening);
-            weather = saturate(weather);
+            float weather = SelasMath.weatherFactor(
+                    level.getRainLevel(partialTick),
+                    level.getThunderLevel(partialTick),
+                    (float) SelasClientConfig.RAIN_DARKENING.getAsDouble(),
+                    (float) SelasClientConfig.THUNDER_DARKENING.getAsDouble());
 
             float naturalSkyFactor = Mth.lerp(night, 1.0F, lunarFactor);
-            float skyFactor = naturalSkyFactor * weather;
+            float skyFactor = SelasMath.saturate(naturalSkyFactor * weather);
 
             float moonWarmth = moonPhaseProgress * night * weather
                     * (float) SelasClientConfig.MOON_WARMTH.getAsDouble();
 
-            return settings.toContext(saturate(skyFactor), night, false, 0.0F, 0.0F, 0.0F, moonWarmth);
+            return new LightingContext(
+                    skyFactor, night, false, 0.0F, 0.0F, 0.0F, moonWarmth,
+                    blockLightPreservation, darknessCurve, nightDesaturation, nightCoolTint,
+                    minimumFloor, caveFloor, starlightFloor);
         }
 
         private float floor(float block, float sky) {
-            float generalFloor = minimumFloor;
             if (skyless) {
-                return generalFloor;
+                return minimumFloor;
             }
-
-            float totalLight = combineLightContributions(saturate(block), saturate(sky));
-            float lowLight = 1.0F - totalLight;
-            float base = Mth.lerp(lowLight, generalFloor, Math.min(generalFloor, caveFloor));
-
-            if (starlightFloor > 0.0F && nightAmount() > 0.0F) {
-                float openSky = saturate(sky);
-                float starlight = starlightFloor * openSky * nightAmount();
-                base = Math.max(base, starlight);
-            }
-
-            return base;
+            return SelasMath.skylitFloor(block, sky, minimumFloor, caveFloor, starlightFloor, nightAmount);
         }
     }
 
     private static float calculateNightAmount(float dayTick) {
         TwilightTimes twilight = getTwilightTimes();
-        float duskStart = twilight.duskStart();
-        float fullNightStart = twilight.fullNightStart();
-        float fullNightEnd = twilight.fullNightEnd();
-        float dawnEnd = twilight.dawnEnd();
-
-        if (isInWrappedRange(dayTick, duskStart, fullNightStart)) {
-            return smootherStep(progressInWrappedRange(dayTick, duskStart, fullNightStart));
-        }
-
-        if (isInWrappedRange(dayTick, fullNightStart, fullNightEnd)) {
-            return 1.0F;
-        }
-
-        if (isInWrappedRange(dayTick, fullNightEnd, dawnEnd)) {
-            return 1.0F - smootherStep(progressInWrappedRange(dayTick, fullNightEnd, dawnEnd));
-        }
-
-        return 0.0F;
+        return SelasMath.nightAmount(
+                dayTick,
+                twilight.duskStart(),
+                twilight.fullNightStart(),
+                twilight.fullNightEnd(),
+                twilight.dawnEnd());
     }
 
     private static TwilightTimes getTwilightTimes() {
@@ -353,7 +278,7 @@ public final class SelasLightmap {
         int fullNightEnd = SelasClientConfig.FULL_NIGHT_END_TICK.get();
         int dawnEnd = SelasClientConfig.DAWN_TRANSITION_END_TICK.get();
 
-        if (dawnEnd < duskStart && duskStart < fullNightStart && fullNightStart < fullNightEnd) {
+        if (SelasMath.isValidTwilightOrder(duskStart, fullNightStart, fullNightEnd, dawnEnd)) {
             return new TwilightTimes(duskStart, fullNightStart, fullNightEnd, dawnEnd);
         }
 
@@ -375,35 +300,5 @@ public final class SelasLightmap {
     }
 
     private record TwilightTimes(int duskStart, int fullNightStart, int fullNightEnd, int dawnEnd) {
-    }
-
-    private static boolean isInWrappedRange(float value, float start, float end) {
-        float length = wrappedDistance(start, end);
-        if (length <= 0.0F) {
-            return false;
-        }
-        return wrappedDistance(start, value) <= length;
-    }
-
-    private static float progressInWrappedRange(float value, float start, float end) {
-        float length = wrappedDistance(start, end);
-        if (length <= 0.0F) {
-            return 1.0F;
-        }
-        return saturate(wrappedDistance(start, value) / length);
-    }
-
-    private static float wrappedDistance(float start, float end) {
-        return positiveModulo(end - start, MINECRAFT_DAY_TICKS);
-    }
-
-    private static float smootherStep(float value) {
-        float t = saturate(value);
-        return t * t * t * (t * (t * 6.0F - 15.0F) + 10.0F);
-    }
-
-    private static float positiveModulo(float value, float modulo) {
-        float result = value % modulo;
-        return result < 0.0F ? result + modulo : result;
     }
 }

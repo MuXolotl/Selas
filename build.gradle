@@ -18,6 +18,7 @@ sourceSets.main.resources {
 }
 
 repositories {
+    mavenCentral()
 }
 
 base {
@@ -79,6 +80,13 @@ configurations {
 }
 
 dependencies {
+    testImplementation platform("org.junit:junit-bom:5.11.3")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
